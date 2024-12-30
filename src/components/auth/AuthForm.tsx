@@ -1,52 +1,67 @@
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "next-themes";
 
-const AuthForm = () => (
-  <Auth
-    supabaseClient={supabase}
-    appearance={{ theme: ThemeSupa }}
-    theme="light"
-    providers={[]}
-    localization={{
-      variables: {
-        sign_in: {
-          email_label: "Correo electrónico",
-          password_label: "Contraseña",
-          email_input_placeholder: "Tu correo electrónico",
-          password_input_placeholder: "Tu contraseña",
-          button_label: "Iniciar sesión",
-          loading_button_label: "Iniciando sesión ...",
-          social_provider_text: "Iniciar sesión con {{provider}}",
-          link_text: "¿Ya tienes una cuenta? Inicia sesión"
+const AuthForm = () => {
+  const { theme: currentTheme } = useTheme();
+
+  return (
+    <Auth
+      supabaseClient={supabase}
+      appearance={{ 
+        theme: ThemeSupa,
+        style: {
+          button: { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' },
+          anchor: { color: 'hsl(var(--primary))' },
         },
-        sign_up: {
-          email_label: "Correo electrónico",
-          password_label: "Contraseña",
-          email_input_placeholder: "Tu correo electrónico",
-          password_input_placeholder: "Tu contraseña",
-          button_label: "Registrarse",
-          loading_button_label: "Registrando ...",
-          social_provider_text: "Registrarse con {{provider}}",
-          link_text: "¿No tienes una cuenta? Regístrate"
-        },
-        forgotten_password: {
-          email_label: "Correo electrónico",
-          password_label: "Contraseña",
-          email_input_placeholder: "Tu correo electrónico",
-          button_label: "Enviar instrucciones",
-          loading_button_label: "Enviando instrucciones ...",
-          link_text: "¿Olvidaste tu contraseña?"
-        },
-        update_password: {
-          password_label: "Nueva contraseña",
-          password_input_placeholder: "Tu nueva contraseña",
-          button_label: "Actualizar contraseña",
-          loading_button_label: "Actualizando contraseña ...",
+      }}
+      theme={currentTheme as 'dark' | 'light'}
+      providers={["google"]}
+      redirectTo={window.location.origin}
+      onError={(error) => {
+        console.error('Auth error:', error);
+      }}
+      localization={{
+        variables: {
+          sign_in: {
+            email_label: "Email",
+            password_label: "Password",
+            email_input_placeholder: "Your email",
+            password_input_placeholder: "Your password",
+            button_label: "Sign in",
+            loading_button_label: "Signing in ...",
+            social_provider_text: "Sign in with {{provider}}",
+            link_text: "Already have an account? Sign in"
+          },
+          sign_up: {
+            email_label: "Email",
+            password_label: "Password",
+            email_input_placeholder: "Your email",
+            password_input_placeholder: "Your password",
+            button_label: "Sign up",
+            loading_button_label: "Signing up ...",
+            social_provider_text: "Sign up with {{provider}}",
+            link_text: "Don't have an account? Sign up"
+          },
+          forgotten_password: {
+            email_label: "Email",
+            password_label: "Password",
+            email_input_placeholder: "Your email",
+            button_label: "Send instructions",
+            loading_button_label: "Sending instructions ...",
+            link_text: "Forgot your password?"
+          },
+          update_password: {
+            password_label: "New password",
+            password_input_placeholder: "Your new password",
+            button_label: "Update password",
+            loading_button_label: "Updating password ...",
+          }
         }
-      }
-    }}
-  />
-);
+      }}
+    />
+  );
+};
 
 export default AuthForm;
