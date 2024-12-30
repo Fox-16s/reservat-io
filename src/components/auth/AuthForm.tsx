@@ -2,6 +2,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "next-themes";
+import { toast } from "@/hooks/use-toast";
 
 const AuthForm = () => {
   const { theme: currentTheme } = useTheme();
@@ -19,9 +20,9 @@ const AuthForm = () => {
       theme={currentTheme as 'dark' | 'light'}
       providers={["google"]}
       redirectTo={window.location.origin}
-      onError={(error) => {
-        console.error('Auth error:', error);
-      }}
+      view="sign_in"
+      showLinks={true}
+      onlyThirdPartyProviders={false}
       localization={{
         variables: {
           sign_in: {
