@@ -97,7 +97,7 @@ const Index = () => {
         </div>
       </div>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-36 lg:pt-40">
-        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-md sm:shadow-xl p-3 sm:p-4 md:p-5 lg:p-6 overflow-x-auto">
+        <div className="bg-white/20 dark:bg-gray-900/20 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-md sm:shadow-xl p-3 sm:p-4 md:p-5 lg:p-6 overflow-x-auto">
           <PropertyCalendar />
         </div>
       </div>
