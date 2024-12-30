@@ -99,21 +99,25 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                       <ChevronRight className={`h-4 w-4 transition-transform ${expandedReservation === reservation.id ? 'rotate-90' : ''}`} />
                     </Button>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {format(reservation.startDate, 'dd/MM/yyyy')} - {format(reservation.endDate, 'dd/MM/yyyy')}
-                  </p>
-                  <p className="text-sm dark:text-gray-300">
-                    <span className="font-medium">Cliente:</span> {reservation.client.name}
-                  </p>
-                  <p className="text-sm dark:text-gray-300">
-                    <span className="font-medium">Teléfono:</span> {reservation.client.phone}
-                  </p>
-                  {reservation.client.notes && (
-                    <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-                      {reservation.client.notes}
+                  <div className="border-t dark:border-gray-700 pt-2 mt-2">
+                    <p className="text-sm dark:text-gray-300">
+                      <span className="font-medium">Cliente:</span> {reservation.client.name}
                     </p>
-                  )}
-                  <div className="flex gap-2">
+                    <p className="text-sm dark:text-gray-300">
+                      <span className="font-medium">Teléfono:</span> {reservation.client.phone}
+                    </p>
+                    {reservation.client.notes && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400 italic mt-1">
+                        {reservation.client.notes}
+                      </p>
+                    )}
+                  </div>
+                  <div className="border-t dark:border-gray-700 pt-2 mt-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="font-medium">Fechas:</span> {format(reservation.startDate, 'dd/MM/yyyy')} - {format(reservation.endDate, 'dd/MM/yyyy')}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 mt-2">
                     <Button
                       variant="outline"
                       size="icon"
@@ -138,20 +142,25 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
             {/* Second Card - Payment Information (Expandable) */}
             {expandedReservation === reservation.id && (
               <Card className="p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm ml-8">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Detalles de Pago</h4>
                   <p className="text-sm font-medium text-green-600 dark:text-green-400">
                     Total: {formatCurrency(reservation.totalAmount)}
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="space-y-2">
                     {reservation.paymentMethods.map((payment, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-1 px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm"
+                        className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50"
                       >
-                        {getPaymentMethodIcon(payment.type)}
-                        <span className="text-gray-700 dark:text-gray-300">
-                          {formatCurrency(payment.amount)}
+                        <div className="flex items-center gap-2">
+                          {getPaymentMethodIcon(payment.type)}
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {formatCurrency(payment.amount)}
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {format(payment.date, 'dd/MM/yyyy')}
                         </span>
                       </div>
                     ))}
