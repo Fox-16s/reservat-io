@@ -4,6 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar } from "@/components/ui/calendar";
 import { CalendarDays } from 'lucide-react';
 import { DateRange } from "react-day-picker";
+import { es } from 'date-fns/locale';
 
 interface DateSelectionCardProps {
   dateRange: DateRange | undefined;
@@ -24,6 +25,13 @@ const DateSelectionCard = ({ dateRange, setDateRange }: DateSelectionCardProps) 
             selected={dateRange}
             onSelect={setDateRange}
             className="rounded-md"
+            locale={es}
+            weekStartsOn={1}
+            formatters={{
+              formatCaption: (date, options) => {
+                return date.toLocaleString('es', { month: 'long', year: 'numeric' });
+              }
+            }}
           />
         </ScrollArea>
       </CardContent>

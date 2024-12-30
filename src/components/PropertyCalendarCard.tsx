@@ -2,6 +2,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Property, Reservation } from '../types/types';
 import { DateRange } from "react-day-picker";
+import { es } from 'date-fns/locale';
 
 interface PropertyCalendarCardProps {
   property: Property;
@@ -59,6 +60,13 @@ const PropertyCalendarCard = ({
             day: "h-9 w-9 p-0 font-normal text-black font-medium",
             day_selected: "bg-blue-500 text-white hover:bg-blue-600",
             day_today: "font-bold underline"
+          }}
+          locale={es}
+          weekStartsOn={1}
+          formatters={{
+            formatCaption: (date, options) => {
+              return date.toLocaleString('es', { month: 'long', year: 'numeric' });
+            }
           }}
         />
       </CardContent>
