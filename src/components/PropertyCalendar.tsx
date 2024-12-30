@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Property, Reservation, Client, PaymentMethod } from '../types/types';
 import PropertyLegend from './PropertyLegend';
 import ReservationList from './ReservationList';
@@ -8,76 +8,15 @@ import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
 import CalendarHeader from './CalendarHeader';
 import ReservationDialog from './ReservationDialog';
-import { supabase } from "@/integrations/supabase/client";
+import { useReservations } from '@/hooks/useReservations';
 
 const PropertyCalendar = () => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [selectedDates, setSelectedDates] = useState<DateRange | undefined>();
-  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [showClientForm, setShowClientForm] = useState(false);
   const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
   const { toast } = useToast();
-
-  useEffect(() => {
-    fetchReservations();
-  }, []);
-
-  const fetchReservations = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error('No authenticated user');
-      }
-
-      const { data: reservationsData, error } = await supabase
-        .from('reservations')
-        .select(`
-          id,
-          property_id,
-          client_name,
-          client_phone,
-          client_notes,
-          start_date,
-          end_date,
-          total_amount,
-          payment_methods (
-            id,
-            type,
-            amount,
-            payment_date
-          )
-        `);
-
-      if (error) throw error;
-
-      const formattedReservations: Reservation[] = reservationsData.map(reservation => ({
-        id: reservation.id,
-        propertyId: reservation.property_id,
-        client: {
-          name: reservation.client_name,
-          phone: reservation.client_phone,
-          notes: reservation.client_notes || '',
-        },
-        startDate: new Date(reservation.start_date),
-        endDate: new Date(reservation.end_date),
-        totalAmount: parseFloat(reservation.total_amount.toString()), // Convert to string first
-        paymentMethods: reservation.payment_methods.map((pm: any) => ({
-          type: pm.type as 'cash' | 'card' | 'bank_transfer',
-          amount: parseFloat(pm.amount.toString()), // Convert to string first
-          date: new Date(pm.payment_date),
-        })),
-      }));
-
-      setReservations(formattedReservations);
-    } catch (error: any) {
-      console.error('Error fetching reservations:', error);
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar las reservas",
-        variant: "destructive",
-      });
-    }
-  };
+  const { reservations, createReservation, updateReservation, deleteReservation } = useReservations();
 
   const handleSelect = (range: DateRange | undefined) => {
     if (!range || !selectedProperty) return;
@@ -121,129 +60,42 @@ const PropertyCalendar = () => {
   const handleClientSubmit = async (client: Client, dateRange: DateRange, totalAmount: number, paymentMethods: PaymentMethod[]) => {
     if (!dateRange.from || !dateRange.to || !selectedProperty) return;
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error('No authenticated user');
-      }
-
-      if (editingReservation) {
-        // Update existing reservation
-        const { error: reservationError } = await supabase
-          .from('reservations')
-          .update({
-            client_name: client.name,
-            client_phone: client.phone,
-            client_notes: client.notes,
-            start_date: dateRange.from.toISOString(),
-            end_date: dateRange.to.toISOString(),
-            total_amount: totalAmount,
-          })
-          .eq('id', editingReservation.id);
-
-        if (reservationError) throw reservationError;
-
-        // Delete existing payment methods
-        const { error: deleteError } = await supabase
-          .from('payment_methods')
-          .delete()
-          .eq('reservation_id', editingReservation.id);
-
-        if (deleteError) throw deleteError;
-
-        // Insert new payment methods
-        if (paymentMethods.length > 0) {
-          const { error: paymentError } = await supabase
-            .from('payment_methods')
-            .insert(paymentMethods.map(pm => ({
-              reservation_id: editingReservation.id,
-              type: pm.type,
-              amount: pm.amount,
-              payment_date: pm.date.toISOString(),
-            })));
-
-          if (paymentError) throw paymentError;
-        }
-
-        toast({
-          title: "Éxito",
-          description: "Reserva actualizada correctamente",
-        });
-      } else {
-        // Create new reservation
-        const { data: newReservation, error: reservationError } = await supabase
-          .from('reservations')
-          .insert({
-            property_id: selectedProperty.id,
-            client_name: client.name,
-            client_phone: client.phone,
-            client_notes: client.notes,
-            start_date: dateRange.from.toISOString(),
-            end_date: dateRange.to.toISOString(),
-            total_amount: totalAmount,
-            user_id: user.id // Add the user_id field
-          })
-          .select()
-          .single();
-
-        if (reservationError) throw reservationError;
-
-        // Insert payment methods
-        if (paymentMethods.length > 0) {
-          const { error: paymentError } = await supabase
-            .from('payment_methods')
-            .insert(paymentMethods.map(pm => ({
-              reservation_id: newReservation.id,
-              type: pm.type,
-              amount: pm.amount,
-              payment_date: pm.date.toISOString(),
-            })));
-
-          if (paymentError) throw paymentError;
-        }
-
-        toast({
-          title: "Éxito",
-          description: "Reserva creada correctamente",
-        });
-      }
-
-      // Refresh reservations
-      await fetchReservations();
-    } catch (error: any) {
-      console.error('Error saving reservation:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo guardar la reserva",
-        variant: "destructive",
-      });
+    let success;
+    if (editingReservation) {
+      success = await updateReservation(
+        editingReservation.id,
+        client,
+        dateRange,
+        totalAmount,
+        paymentMethods
+      );
+    } else {
+      success = await createReservation(
+        selectedProperty.id,
+        client,
+        dateRange,
+        totalAmount,
+        paymentMethods
+      );
     }
 
-    setSelectedDates(undefined);
-    setShowClientForm(false);
-    setEditingReservation(null);
+    if (success) {
+      toast({
+        title: "Éxito",
+        description: editingReservation ? "Reserva actualizada correctamente" : "Reserva creada correctamente",
+      });
+      setSelectedDates(undefined);
+      setShowClientForm(false);
+      setEditingReservation(null);
+    }
   };
 
   const handleDeleteReservation = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('reservations')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      await fetchReservations();
+    const success = await deleteReservation(id);
+    if (success) {
       toast({
         title: "Éxito",
         description: "Reserva eliminada correctamente",
-      });
-    } catch (error: any) {
-      console.error('Error deleting reservation:', error);
-      toast({
-        title: "Error",
-        description: "No se pudo eliminar la reserva",
-        variant: "destructive",
       });
     }
   };
