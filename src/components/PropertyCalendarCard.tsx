@@ -49,25 +49,16 @@ const PropertyCalendarCard = ({
           modifiersStyles={{
             booked: {
               color: 'white',
-              backgroundColor: '#ea384c', // Red for booked dates
+              backgroundColor: '#ea384c',
             },
             default: {
-              backgroundColor: '#F2FCE2', // Light green for available dates
+              backgroundColor: '#F2FCE2',
             }
           }}
-          styles={{
-            day: { 
-              color: 'black',
-              fontWeight: '500',
-            },
-            selected: { // Changed from day_selected to selected
-              backgroundColor: '#3b82f6',
-              color: 'white' 
-            },
-            today: { // Changed from day_today to today
-              fontWeight: 'bold',
-              textDecoration: 'underline'
-            }
+          classNames={{
+            day: "h-9 w-9 p-0 font-normal text-black font-medium",
+            selected: "bg-blue-500 text-white hover:bg-blue-600",
+            today: "font-bold underline"
           }}
         />
       </CardContent>
