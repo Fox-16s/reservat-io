@@ -16,16 +16,17 @@ const PropertyCalendarCard = ({
   onSelect,
   selectedDates 
 }: PropertyCalendarCardProps) => {
-  const getDayClassName = (date: Date): string => {
+  const isDateBooked = (date: Date): boolean => {
     const propertyReservations = reservations.filter(r => r.propertyId === property.id);
-    const isBooked = propertyReservations.some((r) => {
-      const currentDate = new Date(date.setHours(0, 0, 0, 0));
-      const startDate = new Date(r.startDate.setHours(0, 0, 0, 0));
-      const endDate = new Date(r.endDate.setHours(0, 0, 0, 0));
+    return propertyReservations.some((r) => {
+      const currentDate = new Date(date.getTime());
+      currentDate.setHours(0, 0, 0, 0);
+      const startDate = new Date(r.startDate.getTime());
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(r.endDate.getTime());
+      endDate.setHours(0, 0, 0, 0);
       return currentDate >= startDate && currentDate <= endDate;
     });
-
-    return isBooked ? 'bg-red-500' : 'bg-green-500';
   };
 
   return (
@@ -43,12 +44,29 @@ const PropertyCalendarCard = ({
           onSelect={onSelect}
           className="rounded-lg border-2 border-indigo-100 p-4 bg-white shadow-sm"
           modifiers={{
-            booked: (date) => Boolean(getDayClassName(date)),
+            booked: (date) => isDateBooked(date),
           }}
           modifiersStyles={{
             booked: {
               color: 'white',
-              backgroundColor: getDayClassName(new Date()).replace('bg-', '')
+              backgroundColor: '#ea384c', // Red for booked dates
+            },
+            default: {
+              backgroundColor: '#F2FCE2', // Light green for available dates
+            }
+          }}
+          styles={{
+            day: { 
+              color: 'black',
+              fontWeight: '500',
+            },
+            day_selected: { 
+              backgroundColor: '#3b82f6',
+              color: 'white' 
+            },
+            day_today: { 
+              fontWeight: 'bold',
+              textDecoration: 'underline'
             }
           }}
         />
