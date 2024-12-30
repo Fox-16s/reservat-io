@@ -16,14 +16,6 @@ const AuthPage = () => {
       if (event === "USER_UPDATED" && session) {
         navigate("/");
       }
-      // Handle specific error cases
-      if (event === "SIGNED_OUT") {
-        console.log("User signed out");
-      }
-    });
-
-    // Listen for auth errors
-    const authListener = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT") {
         toast({
           title: "Signed out",
@@ -32,9 +24,26 @@ const AuthPage = () => {
       }
     });
 
+    // Listen for auth errors
+    supabase.auth.onError((error) => {
+      console.error("Auth error:", error);
+      if (error.message.includes("User already registered")) {
+        toast({
+          title: "Account exists",
+          description: "This email is already registered. Please sign in instead.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Authentication error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    });
+
     return () => {
       subscription.unsubscribe();
-      authListener.data.subscription.unsubscribe();
     };
   }, [navigate]);
 
@@ -54,22 +63,6 @@ const AuthPage = () => {
           appearance={{ theme: ThemeSupa }}
           theme="light"
           providers={[]}
-          onError={(error) => {
-            console.error("Auth error:", error);
-            if (error.message.includes("User already registered")) {
-              toast({
-                title: "Account exists",
-                description: "This email is already registered. Please sign in instead.",
-                variant: "destructive",
-              });
-            } else {
-              toast({
-                title: "Authentication error",
-                description: error.message,
-                variant: "destructive",
-              });
-            }
-          }}
         />
       </div>
     </div>
