@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Reservation } from '../types/types';
 import { UserInfo } from '../types/userInfo';
 import {
@@ -18,22 +18,11 @@ interface ReservationListProps {
   reservations: Reservation[];
   onDelete: (id: string) => void;
   onEdit: (reservation: Reservation) => void;
-  scrollToReservationId?: string;
 }
 
-const ReservationList = ({ reservations, onDelete, onEdit, scrollToReservationId }: ReservationListProps) => {
+const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProps) => {
   const [selectedReservation, setSelectedReservation] = useState<string | null>(null);
   const [userInfoMap, setUserInfoMap] = useState<Record<string, UserInfo>>({});
-  const reservationRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  useEffect(() => {
-    if (scrollToReservationId && reservationRefs.current[scrollToReservationId]) {
-      reservationRefs.current[scrollToReservationId]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
-    }
-  }, [scrollToReservationId]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -81,16 +70,12 @@ const ReservationList = ({ reservations, onDelete, onEdit, scrollToReservationId
         {sortedReservations.map((reservation) => (
           <ReservationCard
             key={reservation.id}
-            ref={(el) => {
-              reservationRefs.current[reservation.id] = el;
-            }}
             reservation={reservation}
             userInfo={userInfoMap[reservation.userId]}
             onSelect={setSelectedReservation}
             onEdit={onEdit}
             onDelete={setSelectedReservation}
             onWhatsAppClick={handleWhatsAppClick}
-            isHighlighted={scrollToReservationId === reservation.id}
           />
         ))}
         {sortedReservations.length === 0 && (

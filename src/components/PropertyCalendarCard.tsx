@@ -9,7 +9,6 @@ interface PropertyCalendarCardProps {
   reservations: Reservation[];
   onSelect: (range: DateRange | undefined) => void;
   selectedDates?: DateRange;
-  onReservationDoubleClick?: (reservationId: string) => void;
 }
 
 const PropertyCalendarCard = ({ 
@@ -17,7 +16,6 @@ const PropertyCalendarCard = ({
   reservations, 
   onSelect,
   selectedDates,
-  onReservationDoubleClick 
 }: PropertyCalendarCardProps) => {
   const isDateBooked = (date: Date): boolean => {
     const propertyReservations = reservations.filter(r => r.propertyId === property.id);
@@ -47,8 +45,11 @@ const PropertyCalendarCard = ({
 
   const handleDayClick = (date: Date) => {
     const reservation = getReservationForDate(date);
-    if (reservation && onReservationDoubleClick) {
-      onReservationDoubleClick(reservation.id);
+    if (reservation) {
+      const element = document.getElementById(`reservation-${reservation.id}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
   };
 

@@ -8,7 +8,6 @@ import ReservationClientInfo from './ReservationClientInfo';
 import ReservationPaymentInfo from './ReservationPaymentInfo';
 import ReservationActions from './ReservationActions';
 import { PROPERTIES } from '@/utils/reservationUtils';
-import { forwardRef } from 'react';
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -20,7 +19,7 @@ interface ReservationCardProps {
   isHighlighted?: boolean;
 }
 
-const ReservationCard = forwardRef<HTMLDivElement, ReservationCardProps>(({ 
+const ReservationCard = ({ 
   reservation, 
   userInfo, 
   onSelect, 
@@ -28,7 +27,7 @@ const ReservationCard = forwardRef<HTMLDivElement, ReservationCardProps>(({
   onDelete,
   onWhatsAppClick,
   isHighlighted
-}, ref) => {
+}: ReservationCardProps) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -38,7 +37,7 @@ const ReservationCard = forwardRef<HTMLDivElement, ReservationCardProps>(({
 
   return (
     <Card 
-      ref={ref}
+      id={`reservation-${reservation.id}`}
       className={`p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm 
                 hover:shadow-md transition-all duration-300 ease-in-out
                 border border-gray-100/50 dark:border-gray-700/50 
@@ -51,7 +50,7 @@ const ReservationCard = forwardRef<HTMLDivElement, ReservationCardProps>(({
           <div className="flex items-start gap-1.5">
             <div className="flex items-center h-full">
               <Checkbox
-                id={`reservation-${reservation.id}`}
+                id={`checkbox-${reservation.id}`}
                 onCheckedChange={() => onSelect(reservation.id)}
                 className="h-3 w-3 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
@@ -103,8 +102,6 @@ const ReservationCard = forwardRef<HTMLDivElement, ReservationCardProps>(({
       </div>
     </Card>
   );
-});
-
-ReservationCard.displayName = "ReservationCard";
+};
 
 export default ReservationCard;
