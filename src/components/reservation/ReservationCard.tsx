@@ -8,6 +8,7 @@ import ReservationClientInfo from './ReservationClientInfo';
 import ReservationPaymentInfo from './ReservationPaymentInfo';
 import ReservationActions from './ReservationActions';
 import { PROPERTIES } from '@/utils/reservationUtils';
+import { forwardRef } from 'react';
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -17,19 +18,17 @@ interface ReservationCardProps {
   onDelete: (id: string) => void;
   onWhatsAppClick: (phone: string) => void;
   isHighlighted?: boolean;
-  ref?: React.RefObject<HTMLDivElement>;
 }
 
-const ReservationCard = ({ 
+const ReservationCard = forwardRef<HTMLDivElement, ReservationCardProps>(({ 
   reservation, 
   userInfo, 
   onSelect, 
   onEdit, 
   onDelete,
   onWhatsAppClick,
-  isHighlighted,
-  ref
-}: ReservationCardProps) => {
+  isHighlighted
+}, ref) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -104,6 +103,8 @@ const ReservationCard = ({
       </div>
     </Card>
   );
-};
+});
+
+ReservationCard.displayName = "ReservationCard";
 
 export default ReservationCard;

@@ -81,7 +81,9 @@ const ReservationList = ({ reservations, onDelete, onEdit, scrollToReservationId
         {sortedReservations.map((reservation) => (
           <ReservationCard
             key={reservation.id}
-            ref={(el) => reservationRefs.current[reservation.id] = el}
+            ref={(el) => {
+              reservationRefs.current[reservation.id] = el;
+            }}
             reservation={reservation}
             userInfo={userInfoMap[reservation.userId]}
             onSelect={setSelectedReservation}
