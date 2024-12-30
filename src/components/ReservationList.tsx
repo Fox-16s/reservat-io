@@ -97,22 +97,26 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Lista de Reservas</h3>
-      <div className="space-y-4">
+      <div className="space-y-3">
         {sortedReservations.map((reservation) => (
-          <Card key={reservation.id} className="p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
+          <Card 
+            key={reservation.id} 
+            className="p-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:shadow-lg transition-all duration-200 border border-gray-100 dark:border-gray-700 hover:border-primary/20 dark:hover:border-primary/20"
+          >
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
                 <div className="flex items-center h-full pt-1">
                   <Checkbox
                     id={`reservation-${reservation.id}`}
                     onCheckedChange={() => setSelectedReservation(reservation.id)}
+                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                   />
                 </div>
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${PROPERTIES.find(p => p.id === reservation.propertyId)?.color}`} />
-                      <span className="font-medium dark:text-gray-200">
+                      <div className={`w-2.5 h-2.5 rounded-full ${PROPERTIES.find(p => p.id === reservation.propertyId)?.color}`} />
+                      <span className="font-medium text-sm dark:text-gray-200">
                         {PROPERTIES.find(p => p.id === reservation.propertyId)?.name}
                       </span>
                     </div>
@@ -126,8 +130,8 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
 
                   <ReservationClientInfo client={reservation.client} />
 
-                  <div className="pt-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <div className="pt-1">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
                       <span className="font-medium">Fechas:</span> {format(reservation.startDate, 'dd/MM/yyyy')} - {format(reservation.endDate, 'dd/MM/yyyy')}
                     </p>
                   </div>
@@ -141,10 +145,10 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                 </div>
               </div>
 
-              <Separator className="my-4" />
+              <Separator className="my-2" />
 
-              <div className="space-y-3">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Detalles de Pago</h4>
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-gray-700 dark:text-gray-300">Detalles de Pago</h4>
                 <p className="text-sm font-medium text-green-600 dark:text-green-400">
                   Total: {formatCurrency(reservation.totalAmount)}
                 </p>
