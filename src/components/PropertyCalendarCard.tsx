@@ -9,13 +9,15 @@ interface PropertyCalendarCardProps {
   reservations: Reservation[];
   onSelect: (range: DateRange | undefined) => void;
   selectedDates?: DateRange;
+  onReservationDoubleClick?: (reservationId: string) => void;
 }
 
 const PropertyCalendarCard = ({ 
   property, 
   reservations, 
   onSelect,
-  selectedDates 
+  selectedDates,
+  onReservationDoubleClick 
 }: PropertyCalendarCardProps) => {
   const isDateBooked = (date: Date): boolean => {
     const propertyReservations = reservations.filter(r => r.propertyId === property.id);
@@ -28,6 +30,26 @@ const PropertyCalendarCard = ({
       endDate.setHours(0, 0, 0, 0);
       return currentDate >= startDate && currentDate <= endDate;
     });
+  };
+
+  const getReservationForDate = (date: Date): Reservation | undefined => {
+    const propertyReservations = reservations.filter(r => r.propertyId === property.id);
+    return propertyReservations.find((r) => {
+      const currentDate = new Date(date.getTime());
+      currentDate.setHours(0, 0, 0, 0);
+      const startDate = new Date(r.startDate.getTime());
+      startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(r.endDate.getTime());
+      endDate.setHours(0, 0, 0, 0);
+      return currentDate >= startDate && currentDate <= endDate;
+    });
+  };
+
+  const handleDayDoubleClick = (date: Date) => {
+    const reservation = getReservationForDate(date);
+    if (reservation && onReservationDoubleClick) {
+      onReservationDoubleClick(reservation.id);
+    }
   };
 
   return (
@@ -68,6 +90,7 @@ const PropertyCalendarCard = ({
               return date.toLocaleString('es', { month: 'long', year: 'numeric' });
             }
           }}
+          onDayDoubleClick={handleDayDoubleClick}
         />
       </CardContent>
     </Card>

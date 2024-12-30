@@ -14,6 +14,7 @@ const PropertyCalendar = () => {
   const [selectedDates, setSelectedDates] = useState<DateRange | undefined>();
   const [showClientForm, setShowClientForm] = useState(false);
   const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
+  const [scrollToReservationId, setScrollToReservationId] = useState<string | undefined>();
   const { toast } = useToast();
   const { reservations, createReservation, updateReservation, deleteReservation } = useReservations();
 
@@ -109,6 +110,10 @@ const PropertyCalendar = () => {
     setShowClientForm(true);
   };
 
+  const handleReservationDoubleClick = (reservationId: string) => {
+    setScrollToReservationId(reservationId);
+  };
+
   return (
     <div className="space-y-8 p-8">
       <CalendarHeader
@@ -129,6 +134,7 @@ const PropertyCalendar = () => {
               handleSelect(range);
             }}
             selectedDates={selectedProperty?.id === property.id ? selectedDates : undefined}
+            onReservationDoubleClick={handleReservationDoubleClick}
           />
         ))}
       </div>
@@ -138,6 +144,7 @@ const PropertyCalendar = () => {
           reservations={reservations}
           onDelete={handleDeleteReservation}
           onEdit={handleEditReservation}
+          scrollToReservationId={scrollToReservationId}
         />
       </div>
 

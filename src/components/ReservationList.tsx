@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Reservation } from '../types/types';
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
@@ -26,16 +26,22 @@ interface ReservationListProps {
   reservations: Reservation[];
   onDelete: (id: string) => void;
   onEdit: (reservation: Reservation) => void;
+  scrollToReservationId?: string;
 }
 
-interface UserInfo {
-  name: string | null;
-  createdAt: string;
-}
-
-const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProps) => {
+const ReservationList = ({ reservations, onDelete, onEdit, scrollToReservationId }: ReservationListProps) => {
   const [selectedReservation, setSelectedReservation] = useState<string | null>(null);
   const [userInfoMap, setUserInfoMap] = useState<Record<string, UserInfo>>({});
+  const reservationRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    if (scrollToReservationId && reservationRefs.current[scrollToReservationId]) {
+      reservationRefs.current[scrollToReservationId]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
+  }, [scrollToReservationId]);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -100,12 +106,14 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
       <div className="space-y-1.5">
         {sortedReservations.map((reservation) => (
           <Card 
-            key={reservation.id} 
-            className="p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm 
+            key={reservation.id}
+            ref={el => reservationRefs.current[reservation.id] = el}
+            className={`p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm 
                      hover:shadow-md transition-all duration-300 ease-in-out
                      border border-gray-100/50 dark:border-gray-700/50 
                      hover:border-primary/30 dark:hover:border-primary/30
-                     hover:scale-[1.01] transform"
+                     hover:scale-[1.01] transform
+                     ${scrollToReservationId === reservation.id ? 'ring-2 ring-primary ring-offset-2' : ''}`}
           >
             <div className="flex justify-between gap-4">
               <div className="flex-1 space-y-1.5">
