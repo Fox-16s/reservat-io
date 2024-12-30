@@ -4,7 +4,6 @@ import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { format } from 'date-fns';
 import { PROPERTIES } from '../utils/reservationUtils';
-import { ChevronRight } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +20,7 @@ import ReservationHeader from './reservation/ReservationHeader';
 import ReservationClientInfo from './reservation/ReservationClientInfo';
 import ReservationPaymentInfo from './reservation/ReservationPaymentInfo';
 import ReservationActions from './reservation/ReservationActions';
+import { Separator } from './ui/separator';
 
 interface ReservationListProps {
   reservations: Reservation[];
@@ -35,7 +35,6 @@ interface UserInfo {
 
 const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProps) => {
   const [selectedReservation, setSelectedReservation] = useState<string | null>(null);
-  const [expandedReservation, setExpandedReservation] = useState<string | null>(null);
   const [userInfoMap, setUserInfoMap] = useState<Record<string, UserInfo>>({});
 
   useEffect(() => {
@@ -100,8 +99,8 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
       <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Lista de Reservas</h3>
       <div className="space-y-4">
         {sortedReservations.map((reservation) => (
-          <div key={reservation.id} className="space-y-2">
-            <Card className="p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+          <Card key={reservation.id} className="p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+            <div className="space-y-4">
               <div className="flex items-start gap-4">
                 <div className="flex items-center h-full pt-1">
                   <Checkbox
@@ -117,14 +116,6 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                         {PROPERTIES.find(p => p.id === reservation.propertyId)?.name}
                       </span>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setExpandedReservation(expandedReservation === reservation.id ? null : reservation.id)}
-                      className="ml-2"
-                    >
-                      <ChevronRight className={`h-4 w-4 transition-transform ${expandedReservation === reservation.id ? 'rotate-90' : ''}`} />
-                    </Button>
                   </div>
 
                   <ReservationHeader
@@ -135,7 +126,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
 
                   <ReservationClientInfo client={reservation.client} />
 
-                  <div className="border-t dark:border-gray-700 pt-2 mt-2">
+                  <div className="pt-2">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       <span className="font-medium">Fechas:</span> {format(reservation.startDate, 'dd/MM/yyyy')} - {format(reservation.endDate, 'dd/MM/yyyy')}
                     </p>
@@ -144,27 +135,26 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                   <ReservationActions
                     phone={reservation.client.phone}
                     onEdit={() => onEdit(reservation)}
+                    onDelete={() => setSelectedReservation(reservation.id)}
                     onWhatsAppClick={handleWhatsAppClick}
                   />
                 </div>
               </div>
-            </Card>
 
-            {expandedReservation === reservation.id && (
-              <Card className="p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm ml-8">
-                <div className="space-y-3">
-                  <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Detalles de Pago</h4>
-                  <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                    Total: {formatCurrency(reservation.totalAmount)}
-                  </p>
-                  <ReservationPaymentInfo
-                    paymentMethods={reservation.paymentMethods}
-                    formatCurrency={formatCurrency}
-                  />
-                </div>
-              </Card>
-            )}
-          </div>
+              <Separator className="my-4" />
+
+              <div className="space-y-3">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Detalles de Pago</h4>
+                <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                  Total: {formatCurrency(reservation.totalAmount)}
+                </p>
+                <ReservationPaymentInfo
+                  paymentMethods={reservation.paymentMethods}
+                  formatCurrency={formatCurrency}
+                />
+              </div>
+            </div>
+          </Card>
         ))}
         {sortedReservations.length === 0 && (
           <p className="text-center text-gray-500 dark:text-gray-400 py-4">No hay reservas</p>
