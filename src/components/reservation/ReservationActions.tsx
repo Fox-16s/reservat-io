@@ -1,13 +1,14 @@
 import { Button } from '@/components/ui/button';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, Trash2 } from 'lucide-react';
 
 interface ReservationActionsProps {
   phone: string;
   onEdit: () => void;
+  onDelete: () => void;
   onWhatsAppClick: (phone: string) => void;
 }
 
-const ReservationActions = ({ phone, onEdit, onWhatsAppClick }: ReservationActionsProps) => {
+const ReservationActions = ({ phone, onEdit, onDelete, onWhatsAppClick }: ReservationActionsProps) => {
   return (
     <div className="flex gap-2 mt-2">
       <Button
@@ -25,6 +26,15 @@ const ReservationActions = ({ phone, onEdit, onWhatsAppClick }: ReservationActio
         className="dark:border-gray-600 dark:text-gray-300"
       >
         Editar
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onDelete}
+        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900 dark:border-red-800"
+      >
+        <Trash2 className="h-4 w-4 mr-1" />
+        Eliminar
       </Button>
     </div>
   );
