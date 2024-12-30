@@ -8,15 +8,13 @@ interface PropertyCalendarCardProps {
   reservations: Reservation[];
   onSelect: (range: DateRange | undefined) => void;
   selectedDates?: DateRange;
-  onBookedDateClick?: (propertyId: string) => void;
 }
 
 const PropertyCalendarCard = ({ 
   property, 
   reservations, 
   onSelect,
-  selectedDates,
-  onBookedDateClick 
+  selectedDates 
 }: PropertyCalendarCardProps) => {
   const isDateBooked = (date: Date): boolean => {
     const propertyReservations = reservations.filter(r => r.propertyId === property.id);
@@ -29,12 +27,6 @@ const PropertyCalendarCard = ({
       endDate.setHours(0, 0, 0, 0);
       return currentDate >= startDate && currentDate <= endDate;
     });
-  };
-
-  const handleDayClick = (date: Date) => {
-    if (isDateBooked(date) && onBookedDateClick) {
-      onBookedDateClick(property.id);
-    }
   };
 
   return (
@@ -50,7 +42,6 @@ const PropertyCalendarCard = ({
           mode="range"
           selected={selectedDates}
           onSelect={onSelect}
-          onDayClick={handleDayClick}
           className="rounded-lg border-2 border-indigo-100 p-4 bg-white shadow-sm"
           modifiers={{
             booked: (date) => isDateBooked(date),
@@ -65,7 +56,7 @@ const PropertyCalendarCard = ({
             }
           }}
           classNames={{
-            day: "h-9 w-9 p-0 font-normal text-black font-medium cursor-pointer",
+            day: "h-9 w-9 p-0 font-normal text-black font-medium",
             day_selected: "bg-blue-500 text-white hover:bg-blue-600",
             day_today: "font-bold underline"
           }}

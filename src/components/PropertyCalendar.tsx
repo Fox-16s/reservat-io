@@ -1,100 +1,157 @@
-import { useState } from "react";
-import { useReservations } from "../hooks/useReservations";
-import PropertyCalendarCard from "./PropertyCalendarCard";
-import ReservationList from "./ReservationList";
-import ReservationDialog from "./ReservationDialog";
-import { Button } from "./ui/button";
-import { Plus } from "lucide-react";
+import { useState } from 'react';
+import { Property, Reservation, Client, PaymentMethod } from '../types/types';
+import ReservationList from './ReservationList';
+import PropertyCalendarCard from './PropertyCalendarCard';
+import { PROPERTIES, isDateRangeAvailable } from '../utils/reservationUtils';
+import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
-import { Reservation } from "@/types/types";
-import { toast } from "./ui/use-toast";
-
-const properties = [
-  { id: "1", name: "Casa 1", color: "bg-blue-500" },
-  { id: "2", name: "Casa 2", color: "bg-green-500" },
-  { id: "3", name: "Casa 3", color: "bg-purple-500" },
-];
+import CalendarHeader from './CalendarHeader';
+import ReservationDialog from './ReservationDialog';
+import { useReservations } from '@/hooks/useReservations';
 
 const PropertyCalendar = () => {
-  const [selectedDates, setSelectedDates] = useState<DateRange>();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedReservation, setSelectedReservation] = useState<Reservation>();
-  const [highlightedPropertyId, setHighlightedPropertyId] = useState<string>();
-  const { reservations, createReservation, updateReservation, deleteReservation } =
-    useReservations();
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [selectedDates, setSelectedDates] = useState<DateRange | undefined>();
+  const [showClientForm, setShowClientForm] = useState(false);
+  const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
+  const { toast } = useToast();
+  const { reservations, createReservation, updateReservation, deleteReservation } = useReservations();
 
-  const handleCreateReservation = () => {
-    setSelectedReservation(undefined);
-    setIsDialogOpen(true);
+  const handleSelect = (range: DateRange | undefined) => {
+    if (!range || !selectedProperty) return;
+
+    if (!range.from) {
+      setSelectedDates(range);
+    } else if (range.from && range.to) {
+      const startDate = range.from;
+      const endDate = range.to;
+      
+      if (endDate < startDate) {
+        toast({
+          title: "Rango de fechas inválido",
+          description: "La fecha final no puede ser anterior a la fecha inicial",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const isAvailable = editingReservation
+        ? isDateRangeAvailable(startDate, endDate, selectedProperty.id, 
+            reservations.filter(r => r.id !== editingReservation.id))
+        : isDateRangeAvailable(startDate, endDate, selectedProperty.id, reservations);
+
+      if (isAvailable) {
+        setSelectedDates(range);
+        setShowClientForm(true);
+      } else {
+        toast({
+          title: "Rango de fechas no disponible",
+          description: "Esta propiedad ya está reservada para las fechas seleccionadas",
+          variant: "destructive",
+        });
+        setSelectedDates(undefined);
+      }
+    } else {
+      setSelectedDates(range);
+    }
   };
 
-  const handleEditReservation = (reservation: Reservation) => {
-    setSelectedReservation(reservation);
-    setIsDialogOpen(true);
+  const handleClientSubmit = async (client: Client, dateRange: DateRange, totalAmount: number, paymentMethods: PaymentMethod[]) => {
+    if (!dateRange.from || !dateRange.to || !selectedProperty) return;
+
+    let success;
+    if (editingReservation) {
+      success = await updateReservation(
+        editingReservation.id,
+        client,
+        dateRange,
+        totalAmount,
+        paymentMethods
+      );
+    } else {
+      success = await createReservation(
+        selectedProperty.id,
+        client,
+        dateRange,
+        totalAmount,
+        paymentMethods
+      );
+    }
+
+    if (success) {
+      toast({
+        title: "Éxito",
+        description: editingReservation ? "Reserva actualizada correctamente" : "Reserva creada correctamente",
+      });
+      setSelectedDates(undefined);
+      setShowClientForm(false);
+      setEditingReservation(null);
+    }
   };
 
   const handleDeleteReservation = async (id: string) => {
     const success = await deleteReservation(id);
     if (success) {
       toast({
-        title: "Reserva eliminada",
-        description: "La reserva ha sido eliminada exitosamente.",
+        title: "Éxito",
+        description: "Reserva eliminada correctamente",
       });
     }
   };
 
-  const handleBookedDateClick = (propertyId: string) => {
-    setHighlightedPropertyId(propertyId);
-    // Remove highlight after 2 seconds
-    setTimeout(() => {
-      setHighlightedPropertyId(undefined);
-    }, 2000);
+  const handleEditReservation = (reservation: Reservation) => {
+    setEditingReservation(reservation);
+    setSelectedProperty(PROPERTIES.find(p => p.id === reservation.propertyId) || null);
+    setSelectedDates({
+      from: reservation.startDate,
+      to: reservation.endDate,
+    });
+    setShowClientForm(true);
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Calendario</h2>
-          <Button onClick={handleCreateReservation}>
-            <Plus className="mr-2 h-4 w-4" />
-            Nueva Reserva
-          </Button>
-        </div>
-        <div className="space-y-6">
-          {properties.map((property) => (
-            <PropertyCalendarCard
-              key={property.id}
-              property={property}
-              reservations={reservations}
-              selectedDates={selectedDates}
-              onSelect={setSelectedDates}
-              onBookedDateClick={handleBookedDateClick}
-            />
-          ))}
-        </div>
+    <div className="space-y-8 p-8">
+      <CalendarHeader
+        properties={PROPERTIES}
+        selectedProperty={selectedProperty}
+        onPropertySelect={setSelectedProperty}
+        onAddReservation={() => setShowClientForm(true)}
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {PROPERTIES.map((property) => (
+          <PropertyCalendarCard
+            key={property.id}
+            property={property}
+            reservations={reservations}
+            onSelect={(range) => {
+              setSelectedProperty(property);
+              handleSelect(range);
+            }}
+            selectedDates={selectedProperty?.id === property.id ? selectedDates : undefined}
+          />
+        ))}
       </div>
 
-      <div>
-        <h2 className="text-2xl font-bold mb-6">Reservas</h2>
+      <div className="grid grid-cols-1 gap-8">
         <ReservationList
           reservations={reservations}
-          onEdit={handleEditReservation}
           onDelete={handleDeleteReservation}
-          highlightedPropertyId={highlightedPropertyId}
+          onEdit={handleEditReservation}
         />
       </div>
 
       <ReservationDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        properties={properties}
-        reservation={selectedReservation}
-        onSubmit={(propertyId, client, dateRange, totalAmount, paymentMethods) =>
-          selectedReservation
-            ? updateReservation(selectedReservation.id, client, dateRange, totalAmount, paymentMethods)
-            : createReservation(propertyId, client, dateRange, totalAmount, paymentMethods)
-        }
+        open={showClientForm}
+        onOpenChange={setShowClientForm}
+        onSubmit={handleClientSubmit}
+        selectedDates={selectedDates}
+        editingReservation={editingReservation}
+        onCancel={() => {
+          setShowClientForm(false);
+          setEditingReservation(null);
+          setSelectedDates(undefined);
+        }}
       />
     </div>
   );

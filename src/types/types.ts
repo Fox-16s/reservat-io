@@ -20,8 +20,6 @@ export interface Reservation {
   id: string;
   propertyId: string;
   userId: string;
-  userName?: string | null;
-  createdAt?: string;
   client: Client;
   startDate: Date;
   endDate: Date;
