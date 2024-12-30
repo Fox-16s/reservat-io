@@ -25,7 +25,7 @@ const PropertyCalendarCard = ({
       return currentDate >= startDate && currentDate <= endDate;
     });
 
-    return isBooked ? property.color : '';
+    return isBooked ? 'bg-red-500' : 'bg-green-500';
   };
 
   return (
@@ -47,8 +47,8 @@ const PropertyCalendarCard = ({
           }}
           modifiersStyles={{
             booked: {
-              backgroundColor: property.color.replace('bg-', ''),
               color: 'white',
+              backgroundColor: getDayClassName(new Date()).replace('bg-', '')
             }
           }}
         />

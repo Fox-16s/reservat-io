@@ -1,9 +1,19 @@
-import { Reservation, Property } from '../types/types';
+import { Reservation } from '../types/types';
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { format } from 'date-fns';
 import { PROPERTIES } from '../utils/reservationUtils';
-import { toast } from './ui/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from 'react';
 
 interface ReservationListProps {
   reservations: Reservation[];
@@ -12,6 +22,8 @@ interface ReservationListProps {
 }
 
 const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProps) => {
+  const [selectedReservation, setSelectedReservation] = useState<string | null>(null);
+  
   const sortedReservations = [...reservations].sort(
     (a, b) => a.startDate.getTime() - b.startDate.getTime()
   );
@@ -22,6 +34,13 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
 
   const getPropertyColor = (propertyId: string) => {
     return PROPERTIES.find(p => p.id === propertyId)?.color || '';
+  };
+
+  const handleDeleteConfirm = () => {
+    if (selectedReservation) {
+      onDelete(selectedReservation);
+      setSelectedReservation(null);
+    }
   };
 
   return (
@@ -35,7 +54,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
           >
             <Checkbox
               id={`reservation-${reservation.id}`}
-              onCheckedChange={() => onDelete(reservation.id)}
+              onCheckedChange={() => setSelectedReservation(reservation.id)}
             />
             <div className="flex-1 space-y-1">
               <div className="flex items-center gap-2">
@@ -68,6 +87,23 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
           <p className="text-center text-gray-500 py-4">No hay reservas</p>
         )}
       </div>
+
+      <AlertDialog open={!!selectedReservation} onOpenChange={() => setSelectedReservation(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Esto eliminará permanentemente la reserva.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
