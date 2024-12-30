@@ -1,9 +1,10 @@
+import { useState, useEffect } from 'react';
 import { Reservation } from '../types/types';
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { format } from 'date-fns';
 import { PROPERTIES } from '../utils/reservationUtils';
-import { MessageSquare, CreditCard, Banknote, Building2, ChevronRight, User, Clock } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,9 +15,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState, useEffect } from 'react';
 import { Card } from './ui/card';
 import { supabase } from '@/integrations/supabase/client';
+import ReservationHeader from './reservation/ReservationHeader';
+import ReservationClientInfo from './reservation/ReservationClientInfo';
+import ReservationPaymentInfo from './reservation/ReservationPaymentInfo';
+import ReservationActions from './reservation/ReservationActions';
 
 interface ReservationListProps {
   reservations: Reservation[];
@@ -33,7 +37,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
   const [selectedReservation, setSelectedReservation] = useState<string | null>(null);
   const [expandedReservation, setExpandedReservation] = useState<string | null>(null);
   const [userInfoMap, setUserInfoMap] = useState<Record<string, UserInfo>>({});
-  
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       const userIds = [...new Set(reservations.map(r => r.userId))];
@@ -68,16 +72,16 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
     }
   };
 
-  const sortedReservations = [...reservations].sort(
-    (a, b) => a.startDate.getTime() - b.startDate.getTime()
-  );
-
-  const getPropertyName = (propertyId: string) => {
-    return PROPERTIES.find(p => p.id === propertyId)?.name || '';
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS'
+    }).format(amount);
   };
 
-  const getPropertyColor = (propertyId: string) => {
-    return PROPERTIES.find(p => p.id === propertyId)?.color || '';
+  const handleWhatsAppClick = (phone: string) => {
+    const message = encodeURIComponent('¡Hola! Te escribo por la reserva...');
+    window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${message}`, '_blank');
   };
 
   const handleDeleteConfirm = () => {
@@ -87,30 +91,9 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
     }
   };
 
-  const handleWhatsAppClick = (phone: string) => {
-    const message = encodeURIComponent('¡Hola! Te escribo por la reserva...');
-    window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${message}`, '_blank');
-  };
-
-  const getPaymentMethodIcon = (method: string) => {
-    switch (method) {
-      case 'cash':
-        return <Banknote className="h-4 w-4" />;
-      case 'card':
-        return <CreditCard className="h-4 w-4" />;
-      case 'bank_transfer':
-        return <Building2 className="h-4 w-4" />;
-      default:
-        return null;
-    }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
-    }).format(amount);
-  };
+  const sortedReservations = [...reservations].sort(
+    (a, b) => a.startDate.getTime() - b.startDate.getTime()
+  );
 
   return (
     <div className="space-y-4">
@@ -129,8 +112,10 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${getPropertyColor(reservation.propertyId)}`} />
-                      <span className="font-medium dark:text-gray-200">{getPropertyName(reservation.propertyId)}</span>
+                      <div className={`w-3 h-3 rounded-full ${PROPERTIES.find(p => p.id === reservation.propertyId)?.color}`} />
+                      <span className="font-medium dark:text-gray-200">
+                        {PROPERTIES.find(p => p.id === reservation.propertyId)?.name}
+                      </span>
                     </div>
                     <Button
                       variant="ghost"
@@ -142,49 +127,25 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                     </Button>
                   </div>
 
-                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                    <User className="h-4 w-4" />
-                    <span>Created by: {userInfoMap[reservation.userId]?.name || 'Loading...'}</span>
-                    <Clock className="h-4 w-4 ml-2" />
-                    <span>{formatCreatedAt(userInfoMap[reservation.userId]?.createdAt)}</span>
-                  </div>
+                  <ReservationHeader
+                    userName={userInfoMap[reservation.userId]?.name}
+                    createdAt={userInfoMap[reservation.userId]?.createdAt}
+                    formatCreatedAt={formatCreatedAt}
+                  />
 
-                  <div className="border-t dark:border-gray-700 pt-2 mt-2">
-                    <p className="text-sm dark:text-gray-300">
-                      <span className="font-medium">Cliente:</span> {reservation.client.name}
-                    </p>
-                    <p className="text-sm dark:text-gray-300">
-                      <span className="font-medium">Teléfono:</span> {reservation.client.phone}
-                    </p>
-                    {reservation.client.notes && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 italic mt-1">
-                        {reservation.client.notes}
-                      </p>
-                    )}
-                  </div>
+                  <ReservationClientInfo client={reservation.client} />
+
                   <div className="border-t dark:border-gray-700 pt-2 mt-2">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
                       <span className="font-medium">Fechas:</span> {format(reservation.startDate, 'dd/MM/yyyy')} - {format(reservation.endDate, 'dd/MM/yyyy')}
                     </p>
                   </div>
-                  <div className="flex gap-2 mt-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleWhatsAppClick(reservation.client.phone)}
-                      className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900"
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onEdit(reservation)}
-                      className="dark:border-gray-600 dark:text-gray-300"
-                    >
-                      Editar
-                    </Button>
-                  </div>
+
+                  <ReservationActions
+                    phone={reservation.client.phone}
+                    onEdit={() => onEdit(reservation)}
+                    onWhatsAppClick={handleWhatsAppClick}
+                  />
                 </div>
               </div>
             </Card>
@@ -196,24 +157,10 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                   <p className="text-sm font-medium text-green-600 dark:text-green-400">
                     Total: {formatCurrency(reservation.totalAmount)}
                   </p>
-                  <div className="space-y-2">
-                    {reservation.paymentMethods.map((payment, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50"
-                      >
-                        <div className="flex items-center gap-2">
-                          {getPaymentMethodIcon(payment.type)}
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {formatCurrency(payment.amount)}
-                          </span>
-                        </div>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {format(payment.date, 'dd/MM/yyyy')}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                  <ReservationPaymentInfo
+                    paymentMethods={reservation.paymentMethods}
+                    formatCurrency={formatCurrency}
+                  />
                 </div>
               </Card>
             )}
