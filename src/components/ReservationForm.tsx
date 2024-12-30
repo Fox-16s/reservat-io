@@ -7,6 +7,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { Calendar } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { User, Phone, CalendarDays, CreditCard } from 'lucide-react';
 
 interface ReservationFormProps {
   onSubmit: (client: Client, dateRange: DateRange, totalAmount: number, paymentMethods: PaymentMethod[]) => void;
@@ -43,7 +46,7 @@ const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: 
       updatedMethods.push({ 
         type: method, 
         amount: numAmount,
-        date: new Date() // Add current date for new payment methods
+        date: new Date()
       });
     }
     
@@ -92,92 +95,121 @@ const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 p-6 rounded-lg">
-      <div className="space-y-2">
-        <Label htmlFor="name" className="text-lg font-semibold text-gray-700 dark:text-gray-200">Nombre</Label>
-        <Input
-          id="name"
-          value={client.name}
-          onChange={(e) => setClient({ ...client, name: e.target.value })}
-          placeholder="Juan Pérez"
-          className="border-2 border-indigo-100 dark:border-indigo-800 focus:border-indigo-300"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="phone" className="text-lg font-semibold text-gray-700 dark:text-gray-200">Teléfono</Label>
-        <Input
-          id="phone"
-          value={client.phone}
-          onChange={(e) => setClient({ ...client, phone: e.target.value })}
-          placeholder="+1 234 567 8900"
-          className="border-2 border-indigo-100 dark:border-indigo-800 focus:border-indigo-300"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="notes" className="text-lg font-semibold text-gray-700 dark:text-gray-200">Notas</Label>
-        <Textarea
-          id="notes"
-          value={client.notes}
-          onChange={(e) => setClient({ ...client, notes: e.target.value })}
-          placeholder="Agregar notas o comentarios adicionales..."
-          className="border-2 border-indigo-100 dark:border-indigo-800 focus:border-indigo-300 min-h-[100px]"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label className="text-lg font-semibold text-gray-700 dark:text-gray-200">Seleccionar Fechas</Label>
-        <Calendar
-          mode="range"
-          selected={dateRange}
-          onSelect={setDateRange}
-          className="rounded-md border-2 border-indigo-100 dark:border-indigo-800 p-3 bg-white dark:bg-gray-800 shadow-sm"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="totalAmount" className="text-lg font-semibold text-gray-700 dark:text-gray-200">Monto Total</Label>
-        <Input
-          id="totalAmount"
-          type="number"
-          value={totalAmount}
-          onChange={(e) => setTotalAmount(e.target.value)}
-          placeholder="0.00"
-          className="border-2 border-indigo-100 dark:border-indigo-800 focus:border-indigo-300"
-        />
-      </div>
-      <div className="space-y-4">
-        <Label className="text-lg font-semibold text-gray-700 dark:text-gray-200">Métodos de Pago</Label>
-        <div className="space-y-4">
-          {['cash', 'card', 'bank_transfer'].map((method) => (
-            <div key={method} className="flex items-center gap-4">
-              <Input
-                type="number"
-                value={paymentAmounts[method]}
-                onChange={(e) => handlePaymentMethodChange(method as 'cash' | 'card' | 'bank_transfer', e.target.value)}
-                placeholder="0.00"
-                className="border-2 border-indigo-100 dark:border-indigo-800 focus:border-indigo-300"
-              />
-              <Label className="min-w-[120px] text-gray-700 dark:text-gray-200">
-                {method === 'cash' && 'Efectivo'}
-                {method === 'card' && 'Tarjeta'}
-                {method === 'bank_transfer' && 'Transferencia'}
-              </Label>
+    <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl mx-auto">
+      <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+        <CardContent className="p-4 grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <User className="w-4 h-4 text-gray-500" />
+              <Label htmlFor="name" className="text-sm font-medium">Nombre</Label>
             </div>
-          ))}
-        </div>
-      </div>
-      <div className="flex gap-4 pt-4">
-        <Button 
-          type="submit"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-md transition-colors duration-200"
-        >
-          Confirmar
-        </Button>
-        <Button 
-          type="button" 
-          variant="outline" 
+            <Input
+              id="name"
+              value={client.name}
+              onChange={(e) => setClient({ ...client, name: e.target.value })}
+              placeholder="Juan Pérez"
+              className="text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center space-x-2">
+              <Phone className="w-4 h-4 text-gray-500" />
+              <Label htmlFor="phone" className="text-sm font-medium">Teléfono</Label>
+            </div>
+            <Input
+              id="phone"
+              value={client.phone}
+              onChange={(e) => setClient({ ...client, phone: e.target.value })}
+              placeholder="+1 234 567 8900"
+              className="text-sm"
+            />
+          </div>
+
+          <div className="col-span-2 space-y-2">
+            <Label htmlFor="notes" className="text-sm font-medium">Notas</Label>
+            <Textarea
+              id="notes"
+              value={client.notes}
+              onChange={(e) => setClient({ ...client, notes: e.target.value })}
+              placeholder="Agregar notas o comentarios adicionales..."
+              className="text-sm h-20 resize-none"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+        <CardContent className="p-4 space-y-4">
+          <div className="flex items-center space-x-2">
+            <CalendarDays className="w-4 h-4 text-gray-500" />
+            <Label className="text-sm font-medium">Fechas de Reserva</Label>
+          </div>
+          <ScrollArea className="h-[280px] rounded-md border">
+            <Calendar
+              mode="range"
+              selected={dateRange}
+              onSelect={setDateRange}
+              className="rounded-md"
+            />
+          </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
+        <CardContent className="p-4 space-y-4">
+          <div className="flex items-center space-x-2">
+            <CreditCard className="w-4 h-4 text-gray-500" />
+            <Label className="text-sm font-medium">Detalles de Pago</Label>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="totalAmount" className="text-sm font-medium">Monto Total</Label>
+            <Input
+              id="totalAmount"
+              type="number"
+              value={totalAmount}
+              onChange={(e) => setTotalAmount(e.target.value)}
+              placeholder="0.00"
+              className="text-sm"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {['cash', 'card', 'bank_transfer'].map((method) => (
+              <div key={method} className="space-y-2">
+                <Label className="text-sm font-medium">
+                  {method === 'cash' && 'Efectivo'}
+                  {method === 'card' && 'Tarjeta'}
+                  {method === 'bank_transfer' && 'Transferencia'}
+                </Label>
+                <Input
+                  type="number"
+                  value={paymentAmounts[method]}
+                  onChange={(e) => handlePaymentMethodChange(method as 'cash' | 'card' | 'bank_transfer', e.target.value)}
+                  placeholder="0.00"
+                  className="text-sm"
+                />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-end space-x-4">
+        <Button
+          type="button"
+          variant="outline"
           onClick={onCancel}
-          className="border-2 border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900 px-6 py-2 rounded-md transition-colors duration-200"
+          className="text-sm"
         >
           Cancelar
+        </Button>
+        <Button
+          type="submit"
+          className="text-sm bg-indigo-600 hover:bg-indigo-700"
+        >
+          Confirmar
         </Button>
       </div>
     </form>
