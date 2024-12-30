@@ -111,15 +111,16 @@ const PropertyCalendar = () => {
               if (!selectedProperty) {
                 toast({
                   title: "Error",
-                  description: "Please select a property first",
+                  description: "Por favor seleccione una propiedad primero",
                   variant: "destructive",
                 });
                 return;
               }
               setShowClientForm(true);
             }}
+            className="bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200"
           >
-            Add Reservation
+            Agregar Reserva
           </Button>
         </div>
 
@@ -127,14 +128,14 @@ const PropertyCalendar = () => {
           mode="range"
           selected={selectedDates}
           onSelect={handleSelect}
-          className="rounded-md border"
+          className="rounded-lg border-2 border-indigo-100 p-4 bg-white shadow-sm"
           modifiers={{
             booked: (date) => Boolean(getDayClassName(date)),
           }}
           modifiersStyles={{
             booked: {
-              backgroundColor: (date) => getDayClassName(date),
-            },
+              backgroundColor: getDayClassName,
+            } as any // This fixes the type error
           }}
           onDayMouseEnter={(date) => setHoveredDate(date)}
           onDayMouseLeave={() => setHoveredDate(null)}
@@ -142,50 +143,58 @@ const PropertyCalendar = () => {
       </div>
 
       <div className="w-80 space-y-8">
-        <div className="rounded-md border p-4 space-y-4">
-          <h3 className="font-semibold">Property Colors</h3>
+        <div className="rounded-lg border-2 border-indigo-100 p-4 space-y-4 bg-white/80 backdrop-blur-sm">
+          <h3 className="font-semibold text-gray-700">Colores de Propiedades</h3>
           <div className="space-y-2">
             {PROPERTIES.map((property) => (
               <div key={property.id} className="flex items-center gap-2">
                 <div className={`w-4 h-4 rounded-full ${property.color}`} />
-                <span>{property.name}</span>
+                <span className="text-gray-600">{property.name}</span>
               </div>
             ))}
           </div>
         </div>
 
         {hoveredDate && (
-          <div className="rounded-md border p-4 space-y-4">
-            <h3 className="font-semibold">Date Information</h3>
+          <div className="rounded-lg border-2 border-indigo-100 p-4 space-y-4 bg-white/80 backdrop-blur-sm">
+            <h3 className="font-semibold text-gray-700">Información de la Fecha</h3>
             <p className="text-sm text-gray-600">
               {format(hoveredDate, 'PPP')}
             </p>
             {getReservationInfo(hoveredDate) ? (
               <div className="space-y-2">
                 <p className="text-sm">
-                  <span className="font-medium">Property:</span>{' '}
+                  <span className="font-medium">Propiedad:</span>{' '}
                   {PROPERTIES.find(p => p.id === getReservationInfo(hoveredDate)?.propertyId)?.name}
                 </p>
                 <p className="text-sm">
-                  <span className="font-medium">Client:</span>{' '}
+                  <span className="font-medium">Cliente:</span>{' '}
                   {getReservationInfo(hoveredDate)?.client.name}
                 </p>
                 <p className="text-sm">
-                  <span className="font-medium">Phone:</span>{' '}
+                  <span className="font-medium">Teléfono:</span>{' '}
                   {getReservationInfo(hoveredDate)?.client.phone}
                 </p>
+                {getReservationInfo(hoveredDate)?.client.notes && (
+                  <p className="text-sm">
+                    <span className="font-medium">Notas:</span>{' '}
+                    {getReservationInfo(hoveredDate)?.client.notes}
+                  </p>
+                )}
               </div>
             ) : (
-              <p className="text-sm text-gray-500">No reservation for this date</p>
+              <p className="text-sm text-gray-500">No hay reservas para esta fecha</p>
             )}
           </div>
         )}
       </div>
 
       <Dialog open={showClientForm} onOpenChange={setShowClientForm}>
-        <DialogContent>
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Enter Client Details</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-gray-800">
+              Detalles del Cliente
+            </DialogTitle>
           </DialogHeader>
           <ReservationForm
             onSubmit={handleClientSubmit}

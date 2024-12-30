@@ -1,12 +1,13 @@
+export interface Client {
+  name: string;
+  phone: string;
+  notes?: string;
+}
+
 export interface Property {
   id: string;
   name: string;
   color: string;
-}
-
-export interface Client {
-  name: string;
-  phone: string;
 }
 
 export interface Reservation {
@@ -16,3 +17,8 @@ export interface Reservation {
   startDate: Date;
   endDate: Date;
 }
+
+export type DateRange = {
+  from: Date;
+  to: Date;
+};
