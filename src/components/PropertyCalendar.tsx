@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Property, Reservation, Client } from '../types/types';
+import { Property, Reservation, Client, PaymentMethod } from '../types/types';
 import PropertySelector from './PropertySelector';
 import ReservationForm from './ReservationForm';
 import PropertyLegend from './PropertyLegend';
@@ -59,7 +59,7 @@ const PropertyCalendar = () => {
     }
   };
 
-  const handleClientSubmit = (client: Client, dateRange: DateRange) => {
+  const handleClientSubmit = (client: Client, dateRange: DateRange, totalAmount: number, paymentMethods: PaymentMethod[]) => {
     if (!dateRange.from || !dateRange.to || !selectedProperty) return;
 
     if (editingReservation) {
@@ -70,6 +70,8 @@ const PropertyCalendar = () => {
               client,
               startDate: dateRange.from,
               endDate: dateRange.to,
+              totalAmount,
+              paymentMethods,
             }
           : r
       );
@@ -86,6 +88,8 @@ const PropertyCalendar = () => {
         client,
         startDate: dateRange.from,
         endDate: dateRange.to,
+        totalAmount,
+        paymentMethods,
       };
       setReservations([...reservations, newReservation]);
       toast({
@@ -178,7 +182,7 @@ const PropertyCalendar = () => {
       >
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-800">
+            <DialogTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
               {editingReservation ? 'Editar Reserva' : 'Detalles del Cliente'}
             </DialogTitle>
           </DialogHeader>

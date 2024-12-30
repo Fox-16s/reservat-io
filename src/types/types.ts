@@ -10,12 +10,19 @@ export interface Property {
   color: string;
 }
 
+export interface PaymentMethod {
+  type: 'cash' | 'card' | 'bank_transfer';
+  amount: number;
+}
+
 export interface Reservation {
   id: string;
   propertyId: string;
   client: Client;
   startDate: Date;
   endDate: Date;
+  totalAmount: number;
+  paymentMethods: PaymentMethod[];
 }
 
 export type DateRange = {

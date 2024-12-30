@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { format } from 'date-fns';
 import { PROPERTIES } from '../utils/reservationUtils';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, CreditCard, Banknote, Building2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,14 +49,34 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
     window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${message}`, '_blank');
   };
 
+  const getPaymentMethodIcon = (method: string) => {
+    switch (method) {
+      case 'cash':
+        return <Banknote className="h-4 w-4" />;
+      case 'card':
+        return <CreditCard className="h-4 w-4" />;
+      case 'bank_transfer':
+        return <Building2 className="h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('es-AR', {
+      style: 'currency',
+      currency: 'ARS'
+    }).format(amount);
+  };
+
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-700">Lista de Reservas</h3>
+      <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-200">Lista de Reservas</h3>
       <div className="space-y-2">
         {sortedReservations.map((reservation) => (
           <div
             key={reservation.id}
-            className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 bg-white/80 backdrop-blur-sm"
+            className="flex items-start gap-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm"
           >
             <Checkbox
               id={`reservation-${reservation.id}`}
@@ -65,19 +85,35 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
             <div className="flex-1 space-y-1">
               <div className="flex items-center gap-2">
                 <div className={`w-3 h-3 rounded-full ${getPropertyColor(reservation.propertyId)}`} />
-                <span className="font-medium">{getPropertyName(reservation.propertyId)}</span>
+                <span className="font-medium dark:text-gray-200">{getPropertyName(reservation.propertyId)}</span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 {format(reservation.startDate, 'dd/MM/yyyy')} - {format(reservation.endDate, 'dd/MM/yyyy')}
               </p>
-              <p className="text-sm">
+              <p className="text-sm dark:text-gray-300">
                 <span className="font-medium">Cliente:</span> {reservation.client.name}
               </p>
-              <p className="text-sm">
+              <p className="text-sm dark:text-gray-300">
                 <span className="font-medium">Teléfono:</span> {reservation.client.phone}
               </p>
+              <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                Total: {formatCurrency(reservation.totalAmount)}
+              </p>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {reservation.paymentMethods.map((payment, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-1 px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-sm"
+                  >
+                    {getPaymentMethodIcon(payment.type)}
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {formatCurrency(payment.amount)}
+                    </span>
+                  </div>
+                ))}
+              </div>
               {reservation.client.notes && (
-                <p className="text-sm text-gray-600 italic">
+                <p className="text-sm text-gray-600 dark:text-gray-400 italic">
                   {reservation.client.notes}
                 </p>
               )}
@@ -87,7 +123,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                 variant="outline"
                 size="icon"
                 onClick={() => handleWhatsAppClick(reservation.client.phone)}
-                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900"
               >
                 <MessageSquare className="h-4 w-4" />
               </Button>
@@ -95,6 +131,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                 variant="outline"
                 size="sm"
                 onClick={() => onEdit(reservation)}
+                className="dark:border-gray-600 dark:text-gray-300"
               >
                 Editar
               </Button>
@@ -102,7 +139,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
           </div>
         ))}
         {sortedReservations.length === 0 && (
-          <p className="text-center text-gray-500 py-4">No hay reservas</p>
+          <p className="text-center text-gray-500 dark:text-gray-400 py-4">No hay reservas</p>
         )}
       </div>
 
