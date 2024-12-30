@@ -4,6 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Property, Reservation, Client } from '../types/types';
 import PropertySelector from './PropertySelector';
 import ReservationForm from './ReservationForm';
+import PropertyLegend from './PropertyLegend';
+import ReservationList from './ReservationList';
 import { PROPERTIES, isDateRangeAvailable } from '../utils/reservationUtils';
 import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
@@ -16,6 +18,7 @@ const PropertyCalendar = () => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [showClientForm, setShowClientForm] = useState(false);
   const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
+  const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
   const { toast } = useToast();
 
   const handleSelect = (range: DateRange | undefined) => {
@@ -29,20 +32,25 @@ const PropertyCalendar = () => {
       
       if (endDate < startDate) {
         toast({
-          title: "Invalid date range",
-          description: "End date cannot be before start date",
+          title: "Rango de fechas inválido",
+          description: "La fecha final no puede ser anterior a la fecha inicial",
           variant: "destructive",
         });
         return;
       }
 
-      if (isDateRangeAvailable(startDate, endDate, selectedProperty.id, reservations)) {
+      const isAvailable = editingReservation
+        ? isDateRangeAvailable(startDate, endDate, selectedProperty.id, 
+            reservations.filter(r => r.id !== editingReservation.id))
+        : isDateRangeAvailable(startDate, endDate, selectedProperty.id, reservations);
+
+      if (isAvailable) {
         setSelectedDates(range);
         setShowClientForm(true);
       } else {
         toast({
-          title: "Date range unavailable",
-          description: "This property is already reserved for the selected dates",
+          title: "Rango de fechas no disponible",
+          description: "Esta propiedad ya está reservada para las fechas seleccionadas",
           variant: "destructive",
         });
         setSelectedDates(undefined);
@@ -55,33 +63,68 @@ const PropertyCalendar = () => {
   const handleClientSubmit = (client: Client, dateRange: DateRange) => {
     if (!dateRange.from || !dateRange.to || !selectedProperty) return;
 
-    const newReservation: Reservation = {
-      id: Math.random().toString(),
-      propertyId: selectedProperty.id,
-      client,
-      startDate: dateRange.from,
-      endDate: dateRange.to,
-    };
+    if (editingReservation) {
+      // Update existing reservation
+      const updatedReservations = reservations.map(r => 
+        r.id === editingReservation.id
+          ? {
+              ...r,
+              client,
+              startDate: dateRange.from,
+              endDate: dateRange.to,
+            }
+          : r
+      );
+      setReservations(updatedReservations);
+      setEditingReservation(null);
+      toast({
+        title: "Éxito",
+        description: "Reserva actualizada correctamente",
+      });
+    } else {
+      // Create new reservation
+      const newReservation: Reservation = {
+        id: Math.random().toString(),
+        propertyId: selectedProperty.id,
+        client,
+        startDate: dateRange.from,
+        endDate: dateRange.to,
+      };
+      setReservations([...reservations, newReservation]);
+      toast({
+        title: "Éxito",
+        description: "Reserva creada correctamente",
+      });
+    }
 
-    setReservations([...reservations, newReservation]);
     setSelectedDates(undefined);
     setShowClientForm(false);
-    
+  };
+
+  const handleDeleteReservation = (id: string) => {
+    setReservations(reservations.filter(r => r.id !== id));
     toast({
-      title: "Success",
-      description: "Reservation created successfully",
+      title: "Éxito",
+      description: "Reserva eliminada correctamente",
     });
   };
 
-  const getDayClassName = (date: Date) => {
-    const reservation = reservations.find((r) => {
-      const property = PROPERTIES.find((p) => p.id === r.propertyId);
-      return (
-        date >= r.startDate &&
-        date <= r.endDate &&
-        property
-      );
+  const handleEditReservation = (reservation: Reservation) => {
+    setEditingReservation(reservation);
+    setSelectedProperty(PROPERTIES.find(p => p.id === reservation.propertyId) || null);
+    setSelectedDates({
+      from: reservation.startDate,
+      to: reservation.endDate,
     });
+    setShowClientForm(true);
+  };
+
+  const getDayClassName = (date: Date) => {
+    const reservation = reservations.find((r) => 
+      date >= r.startDate && 
+      date <= r.endDate &&
+      (!editingReservation || r.id !== editingReservation.id)
+    );
 
     if (reservation) {
       const property = PROPERTIES.find((p) => p.id === reservation.propertyId);
@@ -89,12 +132,6 @@ const PropertyCalendar = () => {
     }
 
     return '';
-  };
-
-  const getReservationInfo = (date: Date) => {
-    return reservations.find((r) => 
-      date >= r.startDate && date <= r.endDate
-    );
   };
 
   return (
@@ -135,7 +172,7 @@ const PropertyCalendar = () => {
           modifiersStyles={{
             booked: {
               backgroundColor: getDayClassName,
-            } as any // This fixes the type error
+            } as any
           }}
           onDayMouseEnter={(date) => setHoveredDate(date)}
           onDayMouseLeave={() => setHoveredDate(null)}
@@ -143,66 +180,39 @@ const PropertyCalendar = () => {
       </div>
 
       <div className="w-80 space-y-8">
-        <div className="rounded-lg border-2 border-indigo-100 p-4 space-y-4 bg-white/80 backdrop-blur-sm">
-          <h3 className="font-semibold text-gray-700">Colores de Propiedades</h3>
-          <div className="space-y-2">
-            {PROPERTIES.map((property) => (
-              <div key={property.id} className="flex items-center gap-2">
-                <div className={`w-4 h-4 rounded-full ${property.color}`} />
-                <span className="text-gray-600">{property.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {hoveredDate && (
-          <div className="rounded-lg border-2 border-indigo-100 p-4 space-y-4 bg-white/80 backdrop-blur-sm">
-            <h3 className="font-semibold text-gray-700">Información de la Fecha</h3>
-            <p className="text-sm text-gray-600">
-              {format(hoveredDate, 'PPP')}
-            </p>
-            {getReservationInfo(hoveredDate) ? (
-              <div className="space-y-2">
-                <p className="text-sm">
-                  <span className="font-medium">Propiedad:</span>{' '}
-                  {PROPERTIES.find(p => p.id === getReservationInfo(hoveredDate)?.propertyId)?.name}
-                </p>
-                <p className="text-sm">
-                  <span className="font-medium">Cliente:</span>{' '}
-                  {getReservationInfo(hoveredDate)?.client.name}
-                </p>
-                <p className="text-sm">
-                  <span className="font-medium">Teléfono:</span>{' '}
-                  {getReservationInfo(hoveredDate)?.client.phone}
-                </p>
-                {getReservationInfo(hoveredDate)?.client.notes && (
-                  <p className="text-sm">
-                    <span className="font-medium">Notas:</span>{' '}
-                    {getReservationInfo(hoveredDate)?.client.notes}
-                  </p>
-                )}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-500">No hay reservas para esta fecha</p>
-            )}
-          </div>
-        )}
+        <PropertyLegend />
+        <ReservationList
+          reservations={reservations}
+          onDelete={handleDeleteReservation}
+          onEdit={handleEditReservation}
+        />
       </div>
 
-      <Dialog open={showClientForm} onOpenChange={setShowClientForm}>
+      <Dialog 
+        open={showClientForm} 
+        onOpenChange={(open) => {
+          setShowClientForm(open);
+          if (!open) {
+            setEditingReservation(null);
+            setSelectedDates(undefined);
+          }
+        }}
+      >
         <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-gray-800">
-              Detalles del Cliente
+              {editingReservation ? 'Editar Reserva' : 'Detalles del Cliente'}
             </DialogTitle>
           </DialogHeader>
           <ReservationForm
             onSubmit={handleClientSubmit}
             onCancel={() => {
               setShowClientForm(false);
+              setEditingReservation(null);
               setSelectedDates(undefined);
             }}
             initialDateRange={selectedDates}
+            initialData={editingReservation?.client}
           />
         </DialogContent>
       </Dialog>
