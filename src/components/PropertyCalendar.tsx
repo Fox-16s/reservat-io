@@ -1,22 +1,19 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Property, Reservation, Client, PaymentMethod } from '../types/types';
-import PropertySelector from './PropertySelector';
-import ReservationForm from './ReservationForm';
 import PropertyLegend from './PropertyLegend';
 import ReservationList from './ReservationList';
 import PropertyCalendarCard from './PropertyCalendarCard';
 import { PROPERTIES, isDateRangeAvailable } from '../utils/reservationUtils';
 import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
-import { Button } from "@/components/ui/button";
+import CalendarHeader from './CalendarHeader';
+import ReservationDialog from './ReservationDialog';
 
 const PropertyCalendar = () => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [selectedDates, setSelectedDates] = useState<DateRange | undefined>();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [showClientForm, setShowClientForm] = useState(false);
-  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
   const { toast } = useToast();
 
@@ -122,29 +119,12 @@ const PropertyCalendar = () => {
 
   return (
     <div className="space-y-8 p-8">
-      <div className="flex items-center gap-4">
-        <PropertySelector
-          properties={PROPERTIES}
-          selectedProperty={selectedProperty}
-          onSelect={setSelectedProperty}
-        />
-        <Button 
-          onClick={() => {
-            if (!selectedProperty) {
-              toast({
-                title: "Error",
-                description: "Por favor seleccione una propiedad primero",
-                variant: "destructive",
-              });
-              return;
-            }
-            setShowClientForm(true);
-          }}
-          className="bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200"
-        >
-          Agregar Reserva
-        </Button>
-      </div>
+      <CalendarHeader
+        properties={PROPERTIES}
+        selectedProperty={selectedProperty}
+        onPropertySelect={setSelectedProperty}
+        onAddReservation={() => setShowClientForm(true)}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {PROPERTIES.map((property) => (
@@ -170,34 +150,18 @@ const PropertyCalendar = () => {
         />
       </div>
 
-      <Dialog 
-        open={showClientForm} 
-        onOpenChange={(open) => {
-          setShowClientForm(open);
-          if (!open) {
-            setEditingReservation(null);
-            setSelectedDates(undefined);
-          }
+      <ReservationDialog
+        open={showClientForm}
+        onOpenChange={setShowClientForm}
+        onSubmit={handleClientSubmit}
+        selectedDates={selectedDates}
+        editingReservation={editingReservation}
+        onCancel={() => {
+          setShowClientForm(false);
+          setEditingReservation(null);
+          setSelectedDates(undefined);
         }}
-      >
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
-              {editingReservation ? 'Editar Reserva' : 'Detalles del Cliente'}
-            </DialogTitle>
-          </DialogHeader>
-          <ReservationForm
-            onSubmit={handleClientSubmit}
-            onCancel={() => {
-              setShowClientForm(false);
-              setEditingReservation(null);
-              setSelectedDates(undefined);
-            }}
-            initialDateRange={selectedDates}
-            initialData={editingReservation?.client}
-          />
-        </DialogContent>
-      </Dialog>
+      />
     </div>
   );
 };
