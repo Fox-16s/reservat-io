@@ -67,6 +67,9 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
               <p className="text-sm">
                 <span className="font-medium">Cliente:</span> {reservation.client.name}
               </p>
+              <p className="text-sm">
+                <span className="font-medium">Teléfono:</span> {reservation.client.phone}
+              </p>
               {reservation.client.notes && (
                 <p className="text-sm text-gray-600 italic">
                   {reservation.client.notes}
@@ -98,8 +101,9 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>
-              Eliminar
+            <AlertDialogAction onClick={handleDeleteConfirm} className="flex flex-col items-center">
+              <span>Eliminar</span>
+              <span className="text-xs">eliminar</span>
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
