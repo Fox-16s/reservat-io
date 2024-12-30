@@ -18,32 +18,35 @@ const AuthPage = () => {
       }
       if (event === "SIGNED_OUT") {
         toast({
-          title: "Signed out",
-          description: "You have been signed out successfully.",
+          title: "Sesión cerrada",
+          description: "Has cerrado sesión exitosamente.",
         });
       }
     });
 
     // Listen for auth errors
-    supabase.auth.onError((error) => {
-      console.error("Auth error:", error);
-      if (error.message.includes("User already registered")) {
-        toast({
-          title: "Account exists",
-          description: "This email is already registered. Please sign in instead.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Authentication error",
-          description: error.message,
-          variant: "destructive",
-        });
+    const { data: { subscription: errorSubscription } } = supabase.auth.onAuthStateChange((event, error) => {
+      if (event === "USER_DELETED") {
+        console.error("Error de autenticación:", error);
+        if (error?.message?.includes("User already registered")) {
+          toast({
+            title: "Cuenta existente",
+            description: "Este correo ya está registrado. Por favor, inicia sesión.",
+            variant: "destructive",
+          });
+        } else if (error) {
+          toast({
+            title: "Error de autenticación",
+            description: error.message,
+            variant: "destructive",
+          });
+        }
       }
     });
 
     return () => {
       subscription.unsubscribe();
+      errorSubscription.unsubscribe();
     };
   }, [navigate]);
 
@@ -63,6 +66,44 @@ const AuthPage = () => {
           appearance={{ theme: ThemeSupa }}
           theme="light"
           providers={[]}
+          localization={{
+            variables: {
+              sign_in: {
+                email_label: "Correo electrónico",
+                password_label: "Contraseña",
+                email_input_placeholder: "Tu correo electrónico",
+                password_input_placeholder: "Tu contraseña",
+                button_label: "Iniciar sesión",
+                loading_button_label: "Iniciando sesión ...",
+                social_provider_text: "Iniciar sesión con {{provider}}",
+                link_text: "¿Ya tienes una cuenta? Inicia sesión"
+              },
+              sign_up: {
+                email_label: "Correo electrónico",
+                password_label: "Contraseña",
+                email_input_placeholder: "Tu correo electrónico",
+                password_input_placeholder: "Tu contraseña",
+                button_label: "Registrarse",
+                loading_button_label: "Registrando ...",
+                social_provider_text: "Registrarse con {{provider}}",
+                link_text: "¿No tienes una cuenta? Regístrate"
+              },
+              forgotten_password: {
+                email_label: "Correo electrónico",
+                password_label: "Contraseña",
+                email_input_placeholder: "Tu correo electrónico",
+                button_label: "Enviar instrucciones",
+                loading_button_label: "Enviando instrucciones ...",
+                link_text: "¿Olvidaste tu contraseña?"
+              },
+              update_password: {
+                password_label: "Nueva contraseña",
+                password_input_placeholder: "Tu nueva contraseña",
+                button_label: "Actualizar contraseña",
+                loading_button_label: "Actualizando contraseña ...",
+              }
+            }
+          }}
         />
       </div>
     </div>
