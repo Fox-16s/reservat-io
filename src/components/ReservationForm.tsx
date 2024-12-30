@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Client } from '../types/types';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,12 +12,19 @@ interface ReservationFormProps {
   onSubmit: (client: Client, dateRange: DateRange) => void;
   onCancel: () => void;
   initialDateRange?: DateRange;
+  initialData?: Client;
 }
 
-const ReservationForm = ({ onSubmit, onCancel, initialDateRange }: ReservationFormProps) => {
+const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: ReservationFormProps) => {
   const [client, setClient] = useState<Client>({ name: '', phone: '', notes: '' });
   const [dateRange, setDateRange] = useState<DateRange | undefined>(initialDateRange);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (initialData) {
+      setClient(initialData);
+    }
+  }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
