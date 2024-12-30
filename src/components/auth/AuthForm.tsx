@@ -45,7 +45,7 @@ const AuthForm = () => {
         },
       }}
       theme={currentTheme as 'dark' | 'light'}
-      providers={["google"]}
+      providers={[]}
       redirectTo={window.location.origin}
       onlyThirdPartyProviders={false}
       view="sign_in"
