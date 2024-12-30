@@ -22,7 +22,7 @@ const Index = () => {
     <div 
       className="min-h-screen bg-cover bg-center bg-fixed transition-all duration-700"
       style={{
-        backgroundImage: `linear-gradient(var(--gradient-overlay), var(--gradient-overlay)), url("${backgroundImage}")`,
+        backgroundImage: `url("/lovable-uploads/f0bb66d0-9b79-4316-a640-2d76b4644036.png")`,
       }}
     >
       <div className="container mx-auto py-8">
