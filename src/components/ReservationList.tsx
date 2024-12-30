@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { format } from 'date-fns';
 import { PROPERTIES } from '../utils/reservationUtils';
+import { MessageSquare } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +44,11 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
     }
   };
 
+  const handleWhatsAppClick = (phone: string) => {
+    const message = encodeURIComponent('¡Hola! Te escribo por la reserva...');
+    window.open(`https://wa.me/${phone.replace(/\D/g, '')}?text=${message}`, '_blank');
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-700">Lista de Reservas</h3>
@@ -76,14 +82,23 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                 </p>
               )}
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onEdit(reservation)}
-              className="ml-auto"
-            >
-              Editar
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => handleWhatsAppClick(reservation.client.phone)}
+                className="text-green-600 hover:text-green-700 hover:bg-green-50"
+              >
+                <MessageSquare className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(reservation)}
+              >
+                Editar
+              </Button>
+            </div>
           </div>
         ))}
         {sortedReservations.length === 0 && (
@@ -101,9 +116,8 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className="flex flex-col items-center">
-              <span>Eliminar</span>
-              <span className="text-xs">eliminar</span>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Eliminar
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
