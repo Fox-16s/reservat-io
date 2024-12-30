@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { format } from 'date-fns';
 import { PROPERTIES } from '../utils/reservationUtils';
-import { MessageSquare, CreditCard, Banknote, Building2, ChevronRight } from 'lucide-react';
+import { MessageSquare, CreditCard, Banknote, Building2, ChevronRight, User, Clock } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,8 +14,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from './ui/card';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ReservationListProps {
   reservations: Reservation[];
@@ -23,10 +24,39 @@ interface ReservationListProps {
   onEdit: (reservation: Reservation) => void;
 }
 
+interface UserInfo {
+  name: string | null;
+  createdAt: string;
+}
+
 const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProps) => {
   const [selectedReservation, setSelectedReservation] = useState<string | null>(null);
   const [expandedReservation, setExpandedReservation] = useState<string | null>(null);
+  const [userInfoMap, setUserInfoMap] = useState<Record<string, UserInfo>>({});
   
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userIds = [...new Set(reservations.map(r => r.userId))];
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, name, created_at')
+        .in('id', userIds);
+
+      if (profiles) {
+        const userMap: Record<string, UserInfo> = {};
+        profiles.forEach(profile => {
+          userMap[profile.id] = {
+            name: profile.name || 'Unknown User',
+            createdAt: profile.created_at
+          };
+        });
+        setUserInfoMap(userMap);
+      }
+    };
+
+    fetchUserInfo();
+  }, [reservations]);
+
   const sortedReservations = [...reservations].sort(
     (a, b) => a.startDate.getTime() - b.startDate.getTime()
   );
@@ -77,13 +107,14 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
       <div className="space-y-4">
         {sortedReservations.map((reservation) => (
           <div key={reservation.id} className="space-y-2">
-            {/* First Card - Client Information */}
             <Card className="p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
               <div className="flex items-start gap-4">
-                <Checkbox
-                  id={`reservation-${reservation.id}`}
-                  onCheckedChange={() => setSelectedReservation(reservation.id)}
-                />
+                <div className="flex items-center h-full pt-1">
+                  <Checkbox
+                    id={`reservation-${reservation.id}`}
+                    onCheckedChange={() => setSelectedReservation(reservation.id)}
+                  />
+                </div>
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -99,6 +130,14 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                       <ChevronRight className={`h-4 w-4 transition-transform ${expandedReservation === reservation.id ? 'rotate-90' : ''}`} />
                     </Button>
                   </div>
+
+                  <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <User className="h-4 w-4" />
+                    <span>Created by: {userInfoMap[reservation.userId]?.name || 'Loading...'}</span>
+                    <Clock className="h-4 w-4 ml-2" />
+                    <span>{format(new Date(userInfoMap[reservation.userId]?.createdAt || ''), 'dd/MM/yyyy HH:mm')}</span>
+                  </div>
+
                   <div className="border-t dark:border-gray-700 pt-2 mt-2">
                     <p className="text-sm dark:text-gray-300">
                       <span className="font-medium">Cliente:</span> {reservation.client.name}
@@ -139,7 +178,6 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
               </div>
             </Card>
 
-            {/* Second Card - Payment Information (Expandable) */}
             {expandedReservation === reservation.id && (
               <Card className="p-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm ml-8">
                 <div className="space-y-3">

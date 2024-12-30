@@ -13,12 +13,13 @@ export interface Property {
 export interface PaymentMethod {
   type: 'cash' | 'card' | 'bank_transfer';
   amount: number;
-  date: Date; // Added payment date
+  date: Date;
 }
 
 export interface Reservation {
   id: string;
   propertyId: string;
+  userId: string;
   client: Client;
   startDate: Date;
   endDate: Date;
