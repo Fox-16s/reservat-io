@@ -25,15 +25,15 @@ const Index = () => {
         backgroundImage: `url("/lovable-uploads/f0bb66d0-9b79-4316-a640-2d76b4644036.png")`,
       }}
     >
-      <div className="container mx-auto py-8">
-        <div className="flex justify-center mb-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="flex justify-center mb-4 sm:mb-6 lg:mb-8">
           <img 
             src="/lovable-uploads/7ed1ad8a-5c46-4f15-92ad-6ce56d9b16e7.png" 
             alt="Reservat.io" 
-            className="h-16 md:h-20 w-auto"
+            className="h-12 sm:h-14 md:h-16 lg:h-20 w-auto"
           />
         </div>
-        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-xl p-6">
+        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-md sm:shadow-xl p-3 sm:p-4 md:p-5 lg:p-6 overflow-x-auto">
           <PropertyCalendar />
         </div>
       </div>
