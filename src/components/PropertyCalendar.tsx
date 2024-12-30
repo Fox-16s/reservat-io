@@ -6,22 +6,23 @@ import PropertySelector from './PropertySelector';
 import ReservationForm from './ReservationForm';
 import { PROPERTIES, isDateRangeAvailable } from '../utils/reservationUtils';
 import { useToast } from "@/components/ui/use-toast";
+import { DateRange } from "react-day-picker";
 
 const PropertyCalendar = () => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [selectedDates, setSelectedDates] = useState<DateRange | undefined>();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [showClientForm, setShowClientForm] = useState(false);
   const { toast } = useToast();
 
-  const handleSelect = (date: Date | undefined) => {
-    if (!date || !selectedProperty) return;
+  const handleSelect = (range: DateRange | undefined) => {
+    if (!range || !selectedProperty) return;
 
-    if (selectedDates.length === 0) {
-      setSelectedDates([date]);
-    } else if (selectedDates.length === 1) {
-      const startDate = selectedDates[0];
-      const endDate = date;
+    if (!range.from) {
+      setSelectedDates(range);
+    } else if (range.from && range.to) {
+      const startDate = range.from;
+      const endDate = range.to;
       
       if (endDate < startDate) {
         toast({
@@ -33,7 +34,7 @@ const PropertyCalendar = () => {
       }
 
       if (isDateRangeAvailable(startDate, endDate, selectedProperty.id, reservations)) {
-        setSelectedDates([startDate, endDate]);
+        setSelectedDates(range);
         setShowClientForm(true);
       } else {
         toast({
@@ -41,26 +42,26 @@ const PropertyCalendar = () => {
           description: "This property is already reserved for the selected dates",
           variant: "destructive",
         });
-        setSelectedDates([]);
+        setSelectedDates(undefined);
       }
     } else {
-      setSelectedDates([date]);
+      setSelectedDates(range);
     }
   };
 
   const handleClientSubmit = (client: Client) => {
-    if (selectedDates.length !== 2 || !selectedProperty) return;
+    if (!selectedDates?.from || !selectedDates?.to || !selectedProperty) return;
 
     const newReservation: Reservation = {
       id: Math.random().toString(),
       propertyId: selectedProperty.id,
       client,
-      startDate: selectedDates[0],
-      endDate: selectedDates[1],
+      startDate: selectedDates.from,
+      endDate: selectedDates.to,
     };
 
     setReservations([...reservations, newReservation]);
-    setSelectedDates([]);
+    setSelectedDates(undefined);
     setShowClientForm(false);
     
     toast({
@@ -81,7 +82,7 @@ const PropertyCalendar = () => {
 
     if (reservation) {
       const property = PROPERTIES.find((p) => p.id === reservation.propertyId);
-      return property?.color;
+      return property?.color || '';
     }
 
     return '';
@@ -98,13 +99,15 @@ const PropertyCalendar = () => {
       <Calendar
         mode="range"
         selected={selectedDates}
-        onSelect={(value) => handleSelect(value as Date)}
+        onSelect={handleSelect}
         className="rounded-md border"
         modifiers={{
           booked: (date) => Boolean(getDayClassName(date)),
         }}
-        modifiersClassNames={{
-          booked: (date) => getDayClassName(date),
+        modifiersStyles={{
+          booked: (date) => ({
+            backgroundColor: getDayClassName(date),
+          }),
         }}
       />
 
@@ -117,7 +120,7 @@ const PropertyCalendar = () => {
             onSubmit={handleClientSubmit}
             onCancel={() => {
               setShowClientForm(false);
-              setSelectedDates([]);
+              setSelectedDates(undefined);
             }}
           />
         </DialogContent>
