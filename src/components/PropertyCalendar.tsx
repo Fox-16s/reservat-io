@@ -7,12 +7,15 @@ import ReservationForm from './ReservationForm';
 import { PROPERTIES, isDateRangeAvailable } from '../utils/reservationUtils';
 import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 
 const PropertyCalendar = () => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [selectedDates, setSelectedDates] = useState<DateRange | undefined>();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [showClientForm, setShowClientForm] = useState(false);
+  const [hoveredDate, setHoveredDate] = useState<Date | null>(null);
   const { toast } = useToast();
 
   const handleSelect = (range: DateRange | undefined) => {
@@ -88,28 +91,96 @@ const PropertyCalendar = () => {
     return '';
   };
 
-  return (
-    <div className="space-y-8 p-8">
-      <PropertySelector
-        properties={PROPERTIES}
-        selectedProperty={selectedProperty}
-        onSelect={setSelectedProperty}
-      />
+  const getReservationInfo = (date: Date) => {
+    return reservations.find((r) => 
+      date >= r.startDate && date <= r.endDate
+    );
+  };
 
-      <Calendar
-        mode="range"
-        selected={selectedDates}
-        onSelect={handleSelect}
-        className="rounded-md border"
-        modifiers={{
-          booked: (date) => Boolean(getDayClassName(date)),
-        }}
-        modifiersStyles={{
-          booked: (date) => ({
-            backgroundColor: getDayClassName(date),
-          }),
-        }}
-      />
+  return (
+    <div className="flex gap-8 p-8">
+      <div className="space-y-8">
+        <div className="flex items-center gap-4">
+          <PropertySelector
+            properties={PROPERTIES}
+            selectedProperty={selectedProperty}
+            onSelect={setSelectedProperty}
+          />
+          <Button 
+            onClick={() => {
+              if (!selectedProperty) {
+                toast({
+                  title: "Error",
+                  description: "Please select a property first",
+                  variant: "destructive",
+                });
+                return;
+              }
+              setShowClientForm(true);
+            }}
+          >
+            Add Reservation
+          </Button>
+        </div>
+
+        <Calendar
+          mode="range"
+          selected={selectedDates}
+          onSelect={handleSelect}
+          className="rounded-md border"
+          modifiers={{
+            booked: (date) => Boolean(getDayClassName(date)),
+          }}
+          modifiersStyles={{
+            booked: (date) => ({
+              backgroundColor: getDayClassName(date).replace('bg-', ''),
+            }),
+          }}
+          onDayMouseEnter={(date) => setHoveredDate(date)}
+          onDayMouseLeave={() => setHoveredDate(null)}
+        />
+      </div>
+
+      <div className="w-80 space-y-8">
+        <div className="rounded-md border p-4 space-y-4">
+          <h3 className="font-semibold">Property Colors</h3>
+          <div className="space-y-2">
+            {PROPERTIES.map((property) => (
+              <div key={property.id} className="flex items-center gap-2">
+                <div className={`w-4 h-4 rounded-full ${property.color}`} />
+                <span>{property.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {hoveredDate && (
+          <div className="rounded-md border p-4 space-y-4">
+            <h3 className="font-semibold">Date Information</h3>
+            <p className="text-sm text-gray-600">
+              {format(hoveredDate, 'PPP')}
+            </p>
+            {getReservationInfo(hoveredDate) ? (
+              <div className="space-y-2">
+                <p className="text-sm">
+                  <span className="font-medium">Property:</span>{' '}
+                  {PROPERTIES.find(p => p.id === getReservationInfo(hoveredDate)?.propertyId)?.name}
+                </p>
+                <p className="text-sm">
+                  <span className="font-medium">Client:</span>{' '}
+                  {getReservationInfo(hoveredDate)?.client.name}
+                </p>
+                <p className="text-sm">
+                  <span className="font-medium">Phone:</span>{' '}
+                  {getReservationInfo(hoveredDate)?.client.phone}
+                </p>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No reservation for this date</p>
+            )}
+          </div>
+        )}
+      </div>
 
       <Dialog open={showClientForm} onOpenChange={setShowClientForm}>
         <DialogContent>

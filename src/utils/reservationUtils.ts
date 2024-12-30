@@ -1,10 +1,9 @@
 import { Property, Reservation } from '../types/types';
 
 export const PROPERTIES: Property[] = [
-  { id: '1', name: 'Beach House', color: 'bg-[#E5DEFF]' },
-  { id: '2', name: 'Mountain Cabin', color: 'bg-[#F2FCE2]' },
-  { id: '3', name: 'City Apartment', color: 'bg-[#FEC6A1]' },
-  { id: '4', name: 'Lake House', color: 'bg-[#D3E4FD]' },
+  { id: '1', name: 'Puerto del Aguila', color: 'bg-[#FEC6A1]' },
+  { id: '2', name: 'Koch', color: 'bg-[#E5DEFF]' },
+  { id: '3', name: 'Ciudad Parque', color: 'bg-[#D3E4FD]' },
 ];
 
 export const isDateRangeAvailable = (
