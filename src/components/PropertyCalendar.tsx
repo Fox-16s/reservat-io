@@ -52,15 +52,15 @@ const PropertyCalendar = () => {
     }
   };
 
-  const handleClientSubmit = (client: Client) => {
-    if (!selectedDates?.from || !selectedDates?.to || !selectedProperty) return;
+  const handleClientSubmit = (client: Client, dateRange: DateRange) => {
+    if (!dateRange.from || !dateRange.to || !selectedProperty) return;
 
     const newReservation: Reservation = {
       id: Math.random().toString(),
       propertyId: selectedProperty.id,
       client,
-      startDate: selectedDates.from,
-      endDate: selectedDates.to,
+      startDate: dateRange.from,
+      endDate: dateRange.to,
     };
 
     setReservations([...reservations, newReservation]);
@@ -85,7 +85,7 @@ const PropertyCalendar = () => {
 
     if (reservation) {
       const property = PROPERTIES.find((p) => p.id === reservation.propertyId);
-      return property?.color || '';
+      return property?.color.replace('bg-', '') || '';
     }
 
     return '';
@@ -132,9 +132,9 @@ const PropertyCalendar = () => {
             booked: (date) => Boolean(getDayClassName(date)),
           }}
           modifiersStyles={{
-            booked: (date) => ({
-              backgroundColor: getDayClassName(date).replace('bg-', ''),
-            }),
+            booked: {
+              backgroundColor: (date) => getDayClassName(date),
+            },
           }}
           onDayMouseEnter={(date) => setHoveredDate(date)}
           onDayMouseLeave={() => setHoveredDate(null)}
@@ -193,6 +193,7 @@ const PropertyCalendar = () => {
               setShowClientForm(false);
               setSelectedDates(undefined);
             }}
+            initialDateRange={selectedDates}
           />
         </DialogContent>
       </Dialog>
