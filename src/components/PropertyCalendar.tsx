@@ -90,7 +90,11 @@ const PropertyCalendar = () => {
         onOpenChange={setIsDialogOpen}
         properties={properties}
         reservation={selectedReservation}
-        onSubmit={selectedReservation ? updateReservation : createReservation}
+        onSubmit={(propertyId, client, dateRange, totalAmount, paymentMethods) =>
+          selectedReservation
+            ? updateReservation(selectedReservation.id, client, dateRange, totalAmount, paymentMethods)
+            : createReservation(propertyId, client, dateRange, totalAmount, paymentMethods)
+        }
       />
     </div>
   );
