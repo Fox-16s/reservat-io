@@ -2,10 +2,33 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "next-themes";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 const AuthForm = () => {
   const { theme: currentTheme } = useTheme();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        toast.success('Successfully signed in!');
+      } else if (event === 'SIGNED_OUT') {
+        toast.success('Successfully signed out!');
+      } else if (event === 'USER_UPDATED') {
+        toast.success('Profile updated successfully!');
+      } else if (event === 'PASSWORD_RECOVERY') {
+        toast.success('Password recovery email sent!');
+      } else if (event === 'USER_DELETED') {
+        toast.error('Account deleted');
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <Auth
@@ -20,6 +43,10 @@ const AuthForm = () => {
       theme={currentTheme as 'dark' | 'light'}
       providers={["google"]}
       redirectTo={window.location.origin}
+      onError={(error) => {
+        console.error('Auth error:', error);
+        toast.error(error.message);
+      }}
       view="sign_in"
       showLinks={true}
       onlyThirdPartyProviders={false}
