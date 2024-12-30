@@ -26,6 +26,7 @@ export const useReservations = () => {
           start_date,
           end_date,
           total_amount,
+          user_id,
           payment_methods (
             id,
             type,
@@ -39,6 +40,7 @@ export const useReservations = () => {
       const formattedReservations: Reservation[] = reservationsData.map(reservation => ({
         id: reservation.id,
         propertyId: reservation.property_id,
+        userId: reservation.user_id,
         client: {
           name: reservation.client_name,
           phone: reservation.client_phone,
