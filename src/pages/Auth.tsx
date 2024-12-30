@@ -9,8 +9,9 @@ const AuthPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Clear any existing session data on mount
+    // Clear all auth-related data on mount
     localStorage.removeItem('supabase.auth.token');
+    localStorage.removeItem('sb-jlxcyqegecillqbhtaww-auth-token');
     
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -28,6 +29,7 @@ const AuthPage = () => {
       }
       if (event === "SIGNED_OUT") {
         localStorage.removeItem('supabase.auth.token');
+        localStorage.removeItem('sb-jlxcyqegecillqbhtaww-auth-token');
         toast({
           title: "Sesión cerrada",
           description: "Has cerrado sesión exitosamente.",

@@ -23,21 +23,28 @@ const Index = () => {
         setUserEmail(session.user.email);
       } else {
         setUserEmail(null);
+        navigate('/auth');
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
   const handleLogout = async () => {
     try {
-      // First clear local storage
-      localStorage.removeItem('supabase.auth.token');
+      // First check if we have an active session
+      const { data: { session } } = await supabase.auth.getSession();
       
-      // Then attempt to sign out
-      await supabase.auth.signOut();
+      // Clear all local storage related to auth
+      localStorage.removeItem('supabase.auth.token');
+      localStorage.removeItem('sb-jlxcyqegecillqbhtaww-auth-token');
+      
+      // Only attempt to sign out if we have an active session
+      if (session) {
+        await supabase.auth.signOut();
+      }
       
       // Always navigate and show success message
       navigate('/auth');
