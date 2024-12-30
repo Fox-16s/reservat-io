@@ -24,8 +24,14 @@ const AuthPage = () => {
       }
       // Handle auth errors
       if (event === "PASSWORD_RECOVERY") {
-        const error = session as unknown as { error: { message: string } };
-        if (error?.error?.message?.includes("User already registered")) {
+        const error = session as unknown as { error: { message: string; code: string } };
+        if (error?.error?.code === "email_not_confirmed") {
+          toast({
+            title: "Email no confirmado",
+            description: "Por favor, confirma tu email antes de iniciar sesión. Revisa tu bandeja de entrada.",
+            variant: "destructive",
+          });
+        } else if (error?.error?.message?.includes("User already registered")) {
           toast({
             title: "Cuenta existente",
             description: "Este correo ya está registrado. Por favor, inicia sesión.",
