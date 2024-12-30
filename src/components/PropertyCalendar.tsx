@@ -10,7 +10,6 @@ import { PROPERTIES, isDateRangeAvailable } from '../utils/reservationUtils';
 import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
 
 const PropertyCalendar = () => {
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
@@ -169,10 +168,10 @@ const PropertyCalendar = () => {
             booked: (date) => Boolean(getDayClassName(date)),
           }}
           modifiersStyles={{
-            booked: (date) => ({
-              backgroundColor: getDayClassName(date).replace('bg-', ''),
+            booked: {
+              backgroundColor: 'var(--primary)',
               color: 'white',
-            }),
+            }
           }}
           onDayMouseEnter={(date) => setHoveredDate(date)}
           onDayMouseLeave={() => setHoveredDate(null)}
