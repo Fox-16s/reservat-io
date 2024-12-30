@@ -34,19 +34,15 @@ const Index = () => {
 
   const handleLogout = async () => {
     try {
-      // First check if we have an active session
       const { data: { session } } = await supabase.auth.getSession();
       
-      // Clear all local storage related to auth
       localStorage.removeItem('supabase.auth.token');
       localStorage.removeItem('sb-jlxcyqegecillqbhtaww-auth-token');
       
-      // Only attempt to sign out if we have an active session
       if (session) {
         await supabase.auth.signOut();
       }
       
-      // Always navigate and show success message
       navigate('/auth');
       toast({
         title: "Logged out successfully",
@@ -54,7 +50,6 @@ const Index = () => {
       });
     } catch (error: any) {
       console.error('Logout error:', error);
-      // Even if there's an error, we want to navigate away and clear the session
       navigate('/auth');
       toast({
         title: "Session ended",
