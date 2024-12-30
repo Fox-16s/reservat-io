@@ -26,9 +26,13 @@ const Index = () => {
       }}
     >
       <div className="container mx-auto py-8">
-        <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
-          Reservat.io
-        </h1>
+        <div className="flex justify-center mb-8">
+          <img 
+            src="/lovable-uploads/7ed1ad8a-5c46-4f15-92ad-6ce56d9b16e7.png" 
+            alt="Reservat.io" 
+            className="h-16 md:h-20 w-auto"
+          />
+        </div>
         <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-xl p-6">
           <PropertyCalendar />
         </div>
