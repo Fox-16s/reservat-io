@@ -22,22 +22,19 @@ const AuthPage = () => {
           description: "Has cerrado sesión exitosamente.",
         });
       }
-    });
-
-    // Listen for auth errors
-    const { data: { subscription: errorSubscription } } = supabase.auth.onAuthStateChange((event, error) => {
-      if (event === "USER_DELETED") {
-        console.error("Error de autenticación:", error);
-        if (error?.message?.includes("User already registered")) {
+      // Handle auth errors
+      if (event === "PASSWORD_RECOVERY") {
+        const error = session as unknown as { error: { message: string } };
+        if (error?.error?.message?.includes("User already registered")) {
           toast({
             title: "Cuenta existente",
             description: "Este correo ya está registrado. Por favor, inicia sesión.",
             variant: "destructive",
           });
-        } else if (error) {
+        } else if (error?.error?.message) {
           toast({
             title: "Error de autenticación",
-            description: error.message,
+            description: error.error.message,
             variant: "destructive",
           });
         }
@@ -46,7 +43,6 @@ const AuthPage = () => {
 
     return () => {
       subscription.unsubscribe();
-      errorSubscription.unsubscribe();
     };
   }, [navigate]);
 
