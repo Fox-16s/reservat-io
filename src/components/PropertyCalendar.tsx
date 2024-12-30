@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Property, Reservation, Client, PaymentMethod } from '../types/types';
-import PropertyLegend from './PropertyLegend';
 import ReservationList from './ReservationList';
 import PropertyCalendarCard from './PropertyCalendarCard';
 import { PROPERTIES, isDateRangeAvailable } from '../utils/reservationUtils';
@@ -134,8 +133,7 @@ const PropertyCalendar = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <PropertyLegend />
+      <div className="grid grid-cols-1 gap-8">
         <ReservationList
           reservations={reservations}
           onDelete={handleDeleteReservation}
