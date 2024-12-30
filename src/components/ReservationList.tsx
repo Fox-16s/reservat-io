@@ -57,6 +57,17 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
     fetchUserInfo();
   }, [reservations]);
 
+  const formatCreatedAt = (dateString: string | undefined) => {
+    if (!dateString) return 'Unknown date';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid date';
+      return format(date, 'dd/MM/yyyy HH:mm');
+    } catch (error) {
+      return 'Invalid date';
+    }
+  };
+
   const sortedReservations = [...reservations].sort(
     (a, b) => a.startDate.getTime() - b.startDate.getTime()
   );
@@ -135,7 +146,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                     <User className="h-4 w-4" />
                     <span>Created by: {userInfoMap[reservation.userId]?.name || 'Loading...'}</span>
                     <Clock className="h-4 w-4 ml-2" />
-                    <span>{format(new Date(userInfoMap[reservation.userId]?.createdAt || ''), 'dd/MM/yyyy HH:mm')}</span>
+                    <span>{formatCreatedAt(userInfoMap[reservation.userId]?.createdAt)}</span>
                   </div>
 
                   <div className="border-t dark:border-gray-700 pt-2 mt-2">
