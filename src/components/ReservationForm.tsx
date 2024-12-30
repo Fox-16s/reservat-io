@@ -15,6 +15,7 @@ interface ReservationFormProps {
 }
 
 const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: ReservationFormProps) => {
+  const [step, setStep] = useState(1);
   const [client, setClient] = useState<Client>({ name: '', phone: '', notes: '' });
   const [dateRange, setDateRange] = useState<DateRange | undefined>(initialDateRange);
   const [totalAmount, setTotalAmount] = useState<string>('');
@@ -49,12 +50,11 @@ const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: 
     setPaymentMethods(updatedMethods);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleNextStep = () => {
     if (!client.name || !client.phone) {
       toast({
         title: "Error",
-        description: "Por favor complete todos los campos requeridos",
+        description: "Por favor complete nombre y teléfono",
         variant: "destructive",
       });
       return;
@@ -67,6 +67,11 @@ const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: 
       });
       return;
     }
+    setStep(2);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!totalAmount || parseFloat(totalAmount) <= 0) {
       toast({
         title: "Error",
@@ -92,33 +97,58 @@ const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-2xl mx-auto">
-      <ClientDetailsCard client={client} setClient={setClient} />
-      <DateSelectionCard dateRange={dateRange} setDateRange={setDateRange} />
-      <PaymentDetailsCard
-        totalAmount={totalAmount}
-        setTotalAmount={setTotalAmount}
-        paymentAmounts={paymentAmounts}
-        onPaymentMethodChange={handlePaymentMethodChange}
-      />
-
-      <div className="flex justify-end space-x-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          className="text-sm"
-          tabIndex={8}
-        >
-          Cancelar
-        </Button>
-        <Button
-          type="submit"
-          className="text-sm bg-indigo-600 hover:bg-indigo-700"
-          tabIndex={9}
-        >
-          Confirmar
-        </Button>
-      </div>
+      {step === 1 ? (
+        <>
+          <ClientDetailsCard client={client} setClient={setClient} />
+          <DateSelectionCard dateRange={dateRange} setDateRange={setDateRange} />
+          <div className="flex justify-end space-x-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="text-sm"
+              tabIndex={8}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="button"
+              onClick={handleNextStep}
+              className="text-sm bg-indigo-600 hover:bg-indigo-700"
+              tabIndex={9}
+            >
+              Siguiente
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <PaymentDetailsCard
+            totalAmount={totalAmount}
+            setTotalAmount={setTotalAmount}
+            paymentAmounts={paymentAmounts}
+            onPaymentMethodChange={handlePaymentMethodChange}
+          />
+          <div className="flex justify-end space-x-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setStep(1)}
+              className="text-sm"
+              tabIndex={8}
+            >
+              Atrás
+            </Button>
+            <Button
+              type="submit"
+              className="text-sm bg-indigo-600 hover:bg-indigo-700"
+              tabIndex={9}
+            >
+              Confirmar
+            </Button>
+          </div>
+        </>
+      )}
     </form>
   );
 };
