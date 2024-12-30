@@ -9,6 +9,41 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      payment_methods: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          payment_date: string
+          reservation_id: string | null
+          type: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          payment_date: string
+          reservation_id?: string | null
+          type: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_date?: string
+          reservation_id?: string | null
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_methods_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -48,6 +83,45 @@ export type Database = {
           created_at?: string
           id?: number
           Reservas?: string | null
+        }
+        Relationships: []
+      }
+      reservations: {
+        Row: {
+          client_name: string
+          client_notes: string | null
+          client_phone: string
+          created_at: string
+          end_date: string
+          id: string
+          property_id: string
+          start_date: string
+          total_amount: number
+          user_id: string
+        }
+        Insert: {
+          client_name: string
+          client_notes?: string | null
+          client_phone: string
+          created_at?: string
+          end_date: string
+          id?: string
+          property_id: string
+          start_date: string
+          total_amount: number
+          user_id: string
+        }
+        Update: {
+          client_name?: string
+          client_notes?: string | null
+          client_phone?: string
+          created_at?: string
+          end_date?: string
+          id?: string
+          property_id?: string
+          start_date?: string
+          total_amount?: number
+          user_id?: string
         }
         Relationships: []
       }
