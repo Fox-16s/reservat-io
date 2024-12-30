@@ -24,6 +24,11 @@ const PropertyCalendar = () => {
 
   const fetchReservations = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
       const { data: reservationsData, error } = await supabase
         .from('reservations')
         .select(`
@@ -55,10 +60,10 @@ const PropertyCalendar = () => {
         },
         startDate: new Date(reservation.start_date),
         endDate: new Date(reservation.end_date),
-        totalAmount: parseFloat(reservation.total_amount),
+        totalAmount: parseFloat(reservation.total_amount.toString()), // Convert to string first
         paymentMethods: reservation.payment_methods.map((pm: any) => ({
           type: pm.type as 'cash' | 'card' | 'bank_transfer',
-          amount: parseFloat(pm.amount),
+          amount: parseFloat(pm.amount.toString()), // Convert to string first
           date: new Date(pm.payment_date),
         })),
       }));
@@ -117,6 +122,11 @@ const PropertyCalendar = () => {
     if (!dateRange.from || !dateRange.to || !selectedProperty) return;
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
       if (editingReservation) {
         // Update existing reservation
         const { error: reservationError } = await supabase
@@ -171,6 +181,7 @@ const PropertyCalendar = () => {
             start_date: dateRange.from.toISOString(),
             end_date: dateRange.to.toISOString(),
             total_amount: totalAmount,
+            user_id: user.id // Add the user_id field
           })
           .select()
           .single();
