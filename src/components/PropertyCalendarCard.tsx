@@ -45,7 +45,7 @@ const PropertyCalendarCard = ({
     });
   };
 
-  const handleDayDoubleClick = (date: Date) => {
+  const handleDayClick = (date: Date) => {
     const reservation = getReservationForDate(date);
     if (reservation && onReservationDoubleClick) {
       onReservationDoubleClick(reservation.id);
@@ -90,7 +90,7 @@ const PropertyCalendarCard = ({
               return date.toLocaleString('es', { month: 'long', year: 'numeric' });
             }
           }}
-          onDayDoubleClick={handleDayDoubleClick}
+          onDayClick={handleDayClick}
         />
       </CardContent>
     </Card>

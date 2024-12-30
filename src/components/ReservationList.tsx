@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Reservation } from '../types/types';
+import { UserInfo } from '../types/userInfo';
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
 import { format } from 'date-fns';
