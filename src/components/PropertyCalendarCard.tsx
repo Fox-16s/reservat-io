@@ -60,11 +60,11 @@ const PropertyCalendarCard = ({
               color: 'black',
               fontWeight: '500',
             },
-            day_selected: { 
+            selected: { // Changed from day_selected to selected
               backgroundColor: '#3b82f6',
               color: 'white' 
             },
-            day_today: { 
+            today: { // Changed from day_today to today
               fontWeight: 'bold',
               textDecoration: 'underline'
             }
