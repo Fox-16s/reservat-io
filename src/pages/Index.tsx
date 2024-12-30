@@ -27,7 +27,7 @@ const Index = () => {
     >
       <div className="container mx-auto py-8">
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
-          Calendario de Reservas
+          Reservat.io
         </h1>
         <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-xl p-6">
           <PropertyCalendar />
