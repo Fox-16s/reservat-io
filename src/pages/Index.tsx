@@ -75,7 +75,7 @@ const Index = () => {
             <img 
               src="/lovable-uploads/7ed1ad8a-5c46-4f15-92ad-6ce56d9b16e7.png" 
               alt="Reservat.io" 
-              className="h-12 sm:h-14 md:h-16 lg:h-20 w-auto"
+              className="h-12 sm:h-14 md:h-16 lg:h-20 w-auto rounded-lg"
             />
             {userEmail && (
               <div className="flex items-center gap-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm px-4 py-2 rounded-lg">
