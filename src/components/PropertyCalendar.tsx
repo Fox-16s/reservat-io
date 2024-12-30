@@ -64,7 +64,6 @@ const PropertyCalendar = () => {
     if (!dateRange.from || !dateRange.to || !selectedProperty) return;
 
     if (editingReservation) {
-      // Update existing reservation
       const updatedReservations = reservations.map(r => 
         r.id === editingReservation.id
           ? {
@@ -82,7 +81,6 @@ const PropertyCalendar = () => {
         description: "Reserva actualizada correctamente",
       });
     } else {
-      // Create new reservation
       const newReservation: Reservation = {
         id: Math.random().toString(),
         propertyId: selectedProperty.id,
@@ -119,16 +117,17 @@ const PropertyCalendar = () => {
     setShowClientForm(true);
   };
 
-  const getDayClassName = (date: Date) => {
-    const reservation = reservations.find((r) => 
-      date >= r.startDate && 
-      date <= r.endDate &&
-      (!editingReservation || r.id !== editingReservation.id)
-    );
+  const getDayClassName = (date: Date): string => {
+    const reservation = reservations.find((r) => {
+      const currentDate = new Date(date.setHours(0, 0, 0, 0));
+      const startDate = new Date(r.startDate.setHours(0, 0, 0, 0));
+      const endDate = new Date(r.endDate.setHours(0, 0, 0, 0));
+      return currentDate >= startDate && currentDate <= endDate;
+    });
 
     if (reservation) {
       const property = PROPERTIES.find((p) => p.id === reservation.propertyId);
-      return property?.color.replace('bg-', '') || '';
+      return property?.color || '';
     }
 
     return '';
@@ -170,9 +169,10 @@ const PropertyCalendar = () => {
             booked: (date) => Boolean(getDayClassName(date)),
           }}
           modifiersStyles={{
-            booked: {
-              backgroundColor: getDayClassName,
-            } as any
+            booked: (date) => ({
+              backgroundColor: getDayClassName(date).replace('bg-', ''),
+              color: 'white',
+            }),
           }}
           onDayMouseEnter={(date) => setHoveredDate(date)}
           onDayMouseLeave={() => setHoveredDate(null)}
