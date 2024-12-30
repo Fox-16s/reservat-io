@@ -32,7 +32,11 @@ const PaymentForm = ({
     const updatedMethods = paymentMethods.filter(p => p.type !== method);
     
     if (numAmount > 0) {
-      updatedMethods.push({ type: method, amount: numAmount });
+      updatedMethods.push({ 
+        type: method, 
+        amount: numAmount,
+        date: new Date() // Add current date for new payment methods
+      });
     }
     
     setPaymentMethods(updatedMethods);

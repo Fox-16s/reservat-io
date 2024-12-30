@@ -7,7 +7,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { Calendar } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface ReservationFormProps {
   onSubmit: (client: Client, dateRange: DateRange, totalAmount: number, paymentMethods: PaymentMethod[]) => void;
@@ -41,7 +40,11 @@ const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: 
     const updatedMethods = paymentMethods.filter(p => p.type !== method);
     
     if (numAmount > 0) {
-      updatedMethods.push({ type: method, amount: numAmount });
+      updatedMethods.push({ 
+        type: method, 
+        amount: numAmount,
+        date: new Date() // Add current date for new payment methods
+      });
     }
     
     setPaymentMethods(updatedMethods);
