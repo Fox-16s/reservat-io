@@ -9,6 +9,13 @@ const AuthPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/');
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
         navigate("/");
@@ -17,6 +24,8 @@ const AuthPage = () => {
         navigate("/");
       }
       if (event === "SIGNED_OUT") {
+        // Clear any local session data
+        localStorage.removeItem('supabase.auth.token');
         toast({
           title: "Sesión cerrada",
           description: "Has cerrado sesión exitosamente.",

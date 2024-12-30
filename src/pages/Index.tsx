@@ -25,28 +25,34 @@ const Index = () => {
         setUserEmail(session.user.email);
       } else {
         setUserEmail(null);
+        navigate('/auth');
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
+  }, [navigate]);
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
       navigate('/auth');
       toast({
         title: "Logged out successfully",
         description: "You have been logged out of your account.",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Logout error:', error);
       toast({
         title: "Error logging out",
-        description: "There was a problem logging out. Please try again.",
+        description: error.message || "There was a problem logging out. Please try again.",
         variant: "destructive",
       });
+      // Force navigation to auth page even if there's an error
+      navigate('/auth');
     }
   };
 
