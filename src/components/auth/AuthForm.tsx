@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { AuthError } from "@supabase/supabase-js";
 
 const AuthForm = () => {
   const { theme: currentTheme } = useTheme();
@@ -18,8 +19,6 @@ const AuthForm = () => {
         toast.success('Profile updated successfully!');
       } else if (event === 'PASSWORD_RECOVERY') {
         toast.success('Password recovery email sent!');
-      } else if (event === 'USER_DELETED') {
-        toast.error('Account deleted');
       } else if (event === 'TOKEN_REFRESHED') {
         console.log('Token refreshed');
       }
@@ -29,6 +28,11 @@ const AuthForm = () => {
       subscription.unsubscribe();
     };
   }, []);
+
+  const handleError = (error: AuthError) => {
+    console.error('Auth error:', error);
+    toast.error(error.message);
+  };
 
   return (
     <Auth
@@ -43,13 +47,9 @@ const AuthForm = () => {
       theme={currentTheme as 'dark' | 'light'}
       providers={["google"]}
       redirectTo={window.location.origin}
-      onError={(error) => {
-        console.error('Auth error:', error);
-        toast.error(error.message);
-      }}
+      onlyThirdPartyProviders={false}
       view="sign_in"
       showLinks={true}
-      onlyThirdPartyProviders={false}
       localization={{
         variables: {
           sign_in: {
