@@ -57,8 +57,8 @@ const PropertyCalendarCard = ({
           }}
           classNames={{
             day: "h-9 w-9 p-0 font-normal text-black font-medium",
-            selected: "bg-blue-500 text-white hover:bg-blue-600",
-            today: "font-bold underline"
+            day_selected: "bg-blue-500 text-white hover:bg-blue-600",
+            day_today: "font-bold underline"
           }}
         />
       </CardContent>
