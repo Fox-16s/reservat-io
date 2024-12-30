@@ -9,6 +9,9 @@ const AuthPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Clear any existing session data on mount
+    localStorage.removeItem('supabase.auth.token');
+    
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
@@ -24,7 +27,6 @@ const AuthPage = () => {
         navigate("/");
       }
       if (event === "SIGNED_OUT") {
-        // Clear any local session data
         localStorage.removeItem('supabase.auth.token');
         toast({
           title: "Sesión cerrada",

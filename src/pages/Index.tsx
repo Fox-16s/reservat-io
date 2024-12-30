@@ -12,33 +12,34 @@ const Index = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    // Get the current user's session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user?.email) {
         setUserEmail(session.user.email);
       }
     });
 
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user?.email) {
         setUserEmail(session.user.email);
       } else {
         setUserEmail(null);
-        navigate('/auth');
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, []);
 
   const handleLogout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // First clear local storage
+      localStorage.removeItem('supabase.auth.token');
       
+      // Then attempt to sign out
+      await supabase.auth.signOut();
+      
+      // Always navigate and show success message
       navigate('/auth');
       toast({
         title: "Logged out successfully",
@@ -46,13 +47,12 @@ const Index = () => {
       });
     } catch (error: any) {
       console.error('Logout error:', error);
-      toast({
-        title: "Error logging out",
-        description: error.message || "There was a problem logging out. Please try again.",
-        variant: "destructive",
-      });
-      // Force navigation to auth page even if there's an error
+      // Even if there's an error, we want to navigate away and clear the session
       navigate('/auth');
+      toast({
+        title: "Session ended",
+        description: "Your session has been cleared.",
+      });
     }
   };
 
