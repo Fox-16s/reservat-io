@@ -64,9 +64,11 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
   );
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200">Lista de Reservas</h3>
-      <div className="space-y-1.5">
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold tracking-tight mb-4 text-foreground">
+        Lista de Reservas
+      </h3>
+      <div className="space-y-3">
         {sortedReservations.map((reservation) => (
           <ReservationCard
             key={reservation.id}
@@ -79,7 +81,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
           />
         ))}
         {sortedReservations.length === 0 && (
-          <p className="text-center text-[10px] text-gray-500 dark:text-gray-400 py-2">No hay reservas</p>
+          <p className="text-center text-sm text-muted-foreground py-4">No hay reservas</p>
         )}
       </div>
 
