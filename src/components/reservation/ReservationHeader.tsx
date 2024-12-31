@@ -31,7 +31,13 @@ const ReservationHeader = ({ userName, createdAt, formatCreatedAt }: Reservation
       <User className="h-4 w-4" />
       <HoverCard>
         <HoverCardTrigger className="hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer">
-          <span>Creado por: <span className="font-medium">{userName || 'Usuario desconocido'}</span></span>
+          <span>
+            Creado por: <span className="font-medium">{userName || 'Usuario desconocido'}</span>
+            <span className="ml-2 text-xs">
+              <Clock className="h-3 w-3 inline-block mx-1" />
+              {formatDate(createdAt)}
+            </span>
+          </span>
         </HoverCardTrigger>
         <HoverCardContent className="w-auto">
           <div className="flex flex-col gap-2">
