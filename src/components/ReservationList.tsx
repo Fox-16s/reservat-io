@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Reservation } from '../types/types';
 import { UserInfo } from '../types/userInfo';
+import { PROPERTIES } from '@/utils/reservationUtils';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -59,29 +60,39 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
     }
   };
 
-  const sortedReservations = [...reservations].sort(
-    (a, b) => a.startDate.getTime() - b.startDate.getTime()
-  );
+  const groupedReservations = PROPERTIES.map(property => ({
+    property,
+    reservations: reservations
+      .filter(r => r.propertyId === property.id)
+      .sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
+  }));
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200">Lista de Reservas</h3>
-      <div className="space-y-1.5">
-        {sortedReservations.map((reservation) => (
-          <ReservationCard
-            key={reservation.id}
-            reservation={reservation}
-            userInfo={userInfoMap[reservation.userId]}
-            onSelect={setSelectedReservation}
-            onEdit={onEdit}
-            onDelete={setSelectedReservation}
-            onWhatsAppClick={handleWhatsAppClick}
-          />
-        ))}
-        {sortedReservations.length === 0 && (
-          <p className="text-center text-[10px] text-gray-500 dark:text-gray-400 py-2">No hay reservas</p>
-        )}
-      </div>
+    <div className="space-y-8">
+      {groupedReservations.map(({ property, reservations }) => (
+        <div key={property.id} className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <div className={`w-3 h-3 rounded-full ${property.color}`} />
+            <span>{property.name}</span>
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {reservations.map((reservation) => (
+              <ReservationCard
+                key={reservation.id}
+                reservation={reservation}
+                userInfo={userInfoMap[reservation.userId]}
+                onSelect={setSelectedReservation}
+                onEdit={onEdit}
+                onDelete={setSelectedReservation}
+                onWhatsAppClick={handleWhatsAppClick}
+              />
+            ))}
+            {reservations.length === 0 && (
+              <p className="text-sm text-gray-500">No hay reservas para esta propiedad</p>
+            )}
+          </div>
+        </div>
+      ))}
 
       <AlertDialog open={!!selectedReservation} onOpenChange={() => setSelectedReservation(null)}>
         <AlertDialogContent>
