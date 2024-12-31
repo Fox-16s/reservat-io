@@ -140,6 +140,7 @@ export const useReservations = () => {
 
       if (!dateRange.from || !dateRange.to) return;
 
+      // First, update the reservation details
       const { error: reservationError } = await supabase
         .from('reservations')
         .update({
@@ -154,24 +155,42 @@ export const useReservations = () => {
 
       if (reservationError) throw reservationError;
 
-      const { error: deleteError } = await supabase
+      // Get existing payment methods
+      const { data: existingPayments, error: fetchError } = await supabase
         .from('payment_methods')
-        .delete()
+        .select('*')
         .eq('reservation_id', reservationId);
 
-      if (deleteError) throw deleteError;
+      if (fetchError) throw fetchError;
 
-      if (paymentMethods.length > 0) {
-        const { error: paymentError } = await supabase
+      // Compare existing payments with new ones and only update/insert what's changed
+      const existingPaymentMap = new Map(existingPayments.map(p => [
+        `${p.type}-${p.amount}-${p.payment_date}`,
+        p
+      ]));
+
+      const newPaymentMap = new Map(paymentMethods.map(p => [
+        `${p.type}-${p.amount}-${p.date.toISOString()}`,
+        p
+      ]));
+
+      // Find payments to insert (new ones)
+      const paymentsToInsert = Array.from(newPaymentMap.entries())
+        .filter(([key]) => !existingPaymentMap.has(key))
+        .map(([, payment]) => ({
+          reservation_id: reservationId,
+          type: payment.type,
+          amount: payment.amount,
+          payment_date: payment.date.toISOString(),
+        }));
+
+      // Insert new payments if any
+      if (paymentsToInsert.length > 0) {
+        const { error: insertError } = await supabase
           .from('payment_methods')
-          .insert(paymentMethods.map(pm => ({
-            reservation_id: reservationId,
-            type: pm.type,
-            amount: pm.amount,
-            payment_date: pm.date.toISOString(),
-          })));
+          .insert(paymentsToInsert);
 
-        if (paymentError) throw paymentError;
+        if (insertError) throw insertError;
       }
 
       await fetchReservations();
