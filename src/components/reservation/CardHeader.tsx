@@ -4,20 +4,12 @@ import { UserInfo } from '@/types/userInfo';
 
 interface CardHeaderProps {
   property: Property | undefined;
-  totalAmount: number;
   startDate: Date;
   endDate: Date;
   userInfo?: UserInfo;
 }
 
-const CardHeader = ({ property, totalAmount, startDate, endDate, userInfo }: CardHeaderProps) => {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS'
-    }).format(amount);
-  };
-
+const CardHeader = ({ property, startDate, endDate, userInfo }: CardHeaderProps) => {
   return (
     <div className="flex items-start justify-between mb-3">
       <div className="space-y-1">
@@ -30,11 +22,6 @@ const CardHeader = ({ property, totalAmount, startDate, endDate, userInfo }: Car
         <div className="text-xs text-gray-500 dark:text-gray-400">
           {format(startDate, 'dd MMM yy')} - {format(endDate, 'dd MMM yy')}
         </div>
-      </div>
-      <div className="text-right">
-        <p className="text-lg font-semibold text-green-600 dark:text-green-400">
-          {formatCurrency(totalAmount)}
-        </p>
       </div>
     </div>
   );

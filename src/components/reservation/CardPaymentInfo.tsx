@@ -33,9 +33,14 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
 
   return (
     <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">
-      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-        Detalles de Pago
-      </h4>
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          Detalles de Pago
+        </h4>
+        <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+          {formatCurrency(totalAmount)}
+        </p>
+      </div>
       <div className="space-y-1">
         {paymentMethods.map((payment, index) => (
           <div
