@@ -26,25 +26,16 @@ const ReservationPaymentInfo = ({ paymentMethods, formatCurrency }: ReservationP
       {paymentMethods.map((payment, index) => (
         <div
           key={index}
-          className="flex items-center justify-between py-2 border-b last:border-0 dark:border-gray-600"
+          className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50"
         >
           <div className="flex items-center gap-2">
-            <span className="p-1.5 bg-white dark:bg-gray-800 rounded-md">
-              {getPaymentMethodIcon(payment.type)}
+            {getPaymentMethodIcon(payment.type)}
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              {formatCurrency(payment.amount)}
             </span>
-            <div>
-              <p className="text-sm font-medium dark:text-gray-300">
-                {payment.type === 'cash' && 'Efectivo'}
-                {payment.type === 'card' && 'Tarjeta'}
-                {payment.type === 'bank_transfer' && 'Transferencia'}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {format(payment.date, 'dd MMM yy')}
-              </p>
-            </div>
           </div>
-          <span className="text-sm font-medium dark:text-gray-300">
-            {formatCurrency(payment.amount)}
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {format(payment.date, 'dd/MM/yyyy')}
           </span>
         </div>
       ))}
