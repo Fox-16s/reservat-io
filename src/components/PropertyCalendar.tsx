@@ -118,27 +118,26 @@ const PropertyCalendar = () => {
         onAddReservation={() => setShowClientForm(true)}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {PROPERTIES.map((property) => (
-          <PropertyCalendarCard
-            key={property.id}
-            property={property}
-            reservations={reservations}
-            onSelect={(range) => {
-              setSelectedProperty(property);
-              handleSelect(range);
-            }}
-            selectedDates={selectedProperty?.id === property.id ? selectedDates : undefined}
-          />
-        ))}
-      </div>
-
       <div className="grid grid-cols-1 gap-8">
-        <ReservationList
-          reservations={reservations}
-          onDelete={handleDeleteReservation}
-          onEdit={handleEditReservation}
-        />
+        {PROPERTIES.map((property) => (
+          <div key={property.id} className="space-y-4">
+            <PropertyCalendarCard
+              property={property}
+              reservations={reservations}
+              onSelect={(range) => {
+                setSelectedProperty(property);
+                handleSelect(range);
+              }}
+              selectedDates={selectedProperty?.id === property.id ? selectedDates : undefined}
+            />
+            
+            <ReservationList
+              reservations={reservations.filter(r => r.propertyId === property.id)}
+              onDelete={handleDeleteReservation}
+              onEdit={handleEditReservation}
+            />
+          </div>
+        ))}
       </div>
 
       <ReservationDialog
