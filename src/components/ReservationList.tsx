@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Reservation } from '../types/types';
-import { UserInfo } from '../types/userInfo';
 import { PROPERTIES } from '@/utils/reservationUtils';
 import {
   AlertDialog,
@@ -12,7 +11,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { supabase } from '@/integrations/supabase/client';
 import ReservationCard from './reservation/ReservationCard';
 
 interface ReservationListProps {
@@ -23,30 +21,6 @@ interface ReservationListProps {
 
 const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProps) => {
   const [selectedReservation, setSelectedReservation] = useState<string | null>(null);
-  const [userInfoMap, setUserInfoMap] = useState<Record<string, UserInfo>>({});
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      const userIds = [...new Set(reservations.map(r => r.userId))];
-      const { data: profiles } = await supabase
-        .from('profiles')
-        .select('id, name, created_at')
-        .in('id', userIds);
-
-      if (profiles) {
-        const userMap: Record<string, UserInfo> = {};
-        profiles.forEach(profile => {
-          userMap[profile.id] = {
-            name: profile.name || 'Unknown User',
-            createdAt: profile.created_at
-          };
-        });
-        setUserInfoMap(userMap);
-      }
-    };
-
-    fetchUserInfo();
-  }, [reservations]);
 
   const handleWhatsAppClick = (phone: string) => {
     const message = encodeURIComponent('¡Hola! Te escribo por la reserva...');
@@ -75,15 +49,12 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
             <div className={`w-3 h-3 rounded-full ${property.color}`} />
             <span>{property.name}</span>
           </h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4">
             {reservations.map((reservation) => (
               <ReservationCard
                 key={reservation.id}
                 reservation={reservation}
-                userInfo={userInfoMap[reservation.userId]}
-                onSelect={setSelectedReservation}
                 onEdit={onEdit}
-                onDelete={setSelectedReservation}
                 onWhatsAppClick={handleWhatsAppClick}
               />
             ))}
