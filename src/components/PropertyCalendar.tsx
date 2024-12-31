@@ -110,7 +110,7 @@ const PropertyCalendar = () => {
   };
 
   return (
-    <div className="space-y-10 p-8">
+    <div className="space-y-8 p-8">
       <CalendarHeader
         properties={PROPERTIES}
         selectedProperty={selectedProperty}
@@ -118,7 +118,7 @@ const PropertyCalendar = () => {
         onAddReservation={() => setShowClientForm(true)}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {PROPERTIES.map((property) => (
           <PropertyCalendarCard
             key={property.id}
@@ -133,7 +133,7 @@ const PropertyCalendar = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-10">
+      <div className="grid grid-cols-1 gap-8">
         <ReservationList
           reservations={reservations}
           onDelete={handleDeleteReservation}
