@@ -133,29 +133,13 @@ const PropertyCalendar = () => {
         ))}
       </div>
 
-      {PROPERTIES.map((property) => {
-        const propertyReservations = reservations.filter(r => r.propertyId === property.id);
-        if (propertyReservations.length === 0) return null;
-        
-        return (
-          <div key={property.id} className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${property.color}`} />
-              <span>{property.name}</span>
-            </h3>
-            <div className="space-y-4">
-              {propertyReservations.map((reservation) => (
-                <ReservationList
-                  key={reservation.id}
-                  reservations={[reservation]}
-                  onDelete={handleDeleteReservation}
-                  onEdit={handleEditReservation}
-                />
-              ))}
-            </div>
-          </div>
-        );
-      })}
+      <div className="grid grid-cols-1 gap-8">
+        <ReservationList
+          reservations={reservations}
+          onDelete={handleDeleteReservation}
+          onEdit={handleEditReservation}
+        />
+      </div>
 
       <ReservationDialog
         open={showClientForm}
