@@ -49,7 +49,6 @@ const ReservationCard = ({
         <div className="flex-1 space-y-3">
           <CardHeader
             property={property}
-            totalAmount={reservation.totalAmount}
             startDate={reservation.startDate}
             endDate={reservation.endDate}
             userInfo={userInfo}
