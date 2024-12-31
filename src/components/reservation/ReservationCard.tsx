@@ -57,7 +57,10 @@ const ReservationCard = ({
           
           <CardClientInfo client={reservation.client} />
           
-          <CardPaymentInfo paymentMethods={reservation.paymentMethods} />
+          <CardPaymentInfo 
+            paymentMethods={reservation.paymentMethods} 
+            totalAmount={reservation.totalAmount}
+          />
           
           <ReservationActions
             phone={reservation.client.phone}

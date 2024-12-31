@@ -4,9 +4,10 @@ import { Banknote, CreditCard, Building2 } from 'lucide-react';
 
 interface CardPaymentInfoProps {
   paymentMethods: PaymentMethod[];
+  totalAmount: number;
 }
 
-const CardPaymentInfo = ({ paymentMethods }: CardPaymentInfoProps) => {
+const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -26,6 +27,9 @@ const CardPaymentInfo = ({ paymentMethods }: CardPaymentInfoProps) => {
         return null;
     }
   };
+
+  const totalPaid = paymentMethods.reduce((sum, payment) => sum + payment.amount, 0);
+  const remainingAmount = totalAmount - totalPaid;
 
   return (
     <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-2">
@@ -58,6 +62,21 @@ const CardPaymentInfo = ({ paymentMethods }: CardPaymentInfoProps) => {
             </span>
           </div>
         ))}
+        
+        <div className="pt-2 border-t dark:border-gray-600">
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium dark:text-gray-300">Total Pagado:</span>
+            <span className="text-sm font-medium text-green-600 dark:text-green-400">
+              {formatCurrency(totalPaid)}
+            </span>
+          </div>
+          <div className="flex justify-between items-center mt-1">
+            <span className="text-sm font-medium dark:text-gray-300">Restante:</span>
+            <span className={`text-sm font-medium ${remainingAmount > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+              {formatCurrency(remainingAmount)}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );
