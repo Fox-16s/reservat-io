@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from '@/integrations/supabase/client';
 import ReservationCard from './reservation/ReservationCard';
-import { startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 
 interface ReservationListProps {
   reservations: Reservation[];
@@ -60,30 +59,14 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
     }
   };
 
-  // Filter reservations for the current month
-  const currentMonthStart = startOfMonth(new Date());
-  const currentMonthEnd = endOfMonth(new Date());
-
-  const currentMonthReservations = reservations.filter(reservation => 
-    isWithinInterval(reservation.startDate, {
-      start: currentMonthStart,
-      end: currentMonthEnd
-    }) ||
-    isWithinInterval(reservation.endDate, {
-      start: currentMonthStart,
-      end: currentMonthEnd
-    }) ||
-    (reservation.startDate <= currentMonthStart && reservation.endDate >= currentMonthEnd)
-  );
-
-  const sortedReservations = [...currentMonthReservations].sort(
+  const sortedReservations = [...reservations].sort(
     (a, b) => a.startDate.getTime() - b.startDate.getTime()
   );
 
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold tracking-tight mb-4 text-foreground">
-        Lista de Reservas - {currentMonthStart.toLocaleString('default', { month: 'long', year: 'numeric' })}
+        Lista de Reservas
       </h3>
       <div className="space-y-3">
         {sortedReservations.map((reservation) => (
@@ -98,7 +81,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
           />
         ))}
         {sortedReservations.length === 0 && (
-          <p className="text-center text-sm text-muted-foreground py-4">No hay reservas este mes</p>
+          <p className="text-center text-sm text-muted-foreground py-4">No hay reservas</p>
         )}
       </div>
 
