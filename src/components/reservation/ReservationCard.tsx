@@ -6,7 +6,7 @@ import { Checkbox } from '../ui/checkbox';
 import ReservationHeader from './ReservationHeader';
 import ReservationClientInfo from './ReservationClientInfo';
 import ReservationPaymentInfo from './ReservationPaymentInfo';
-import ReservationActions from './ReservationActions';
+import ReservationActions from '../ReservationActions';
 import { PROPERTIES } from '@/utils/reservationUtils';
 
 interface ReservationCardProps {
@@ -35,68 +35,71 @@ const ReservationCard = ({
     }).format(amount);
   };
 
+  const property = PROPERTIES.find(p => p.id === reservation.propertyId);
+
   return (
     <Card 
       id={`reservation-${reservation.id}`}
-      className={`p-2 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm 
+      className={`p-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm 
                 hover:shadow-md transition-all duration-300 ease-in-out
                 border border-gray-100/50 dark:border-gray-700/50 
                 hover:border-primary/30 dark:hover:border-primary/30
                 hover:scale-[1.01] transform
                 ${isHighlighted ? 'ring-2 ring-primary ring-offset-2' : ''}`}
     >
-      <div className="flex justify-between gap-4">
-        <div className="flex-1 space-y-1.5">
-          <div className="flex items-start gap-1.5">
-            <div className="flex items-center h-full">
-              <Checkbox
-                id={`checkbox-${reservation.id}`}
-                onCheckedChange={() => onSelect(reservation.id)}
-                className="h-3 w-3 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-              />
-            </div>
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <div className={`w-1.5 h-1.5 rounded-full ${PROPERTIES.find(p => p.id === reservation.propertyId)?.color}`} />
-                  <span className="font-medium text-[10px] dark:text-gray-200">
-                    {PROPERTIES.find(p => p.id === reservation.propertyId)?.name}
-                  </span>
-                </div>
+      <div className="flex items-start gap-4">
+        <Checkbox
+          id={`checkbox-${reservation.id}`}
+          onCheckedChange={() => onSelect(reservation.id)}
+          className="mt-1 h-3 w-3 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+        />
+        
+        <div className="flex-1 space-y-4">
+          {/* Header Section */}
+          <div className="flex items-start justify-between">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${property?.color}`} />
+                <span className="font-medium text-sm dark:text-gray-200">
+                  {property?.name}
+                </span>
               </div>
-
               <ReservationHeader
                 userName={userInfo?.name}
                 createdAt={userInfo?.createdAt}
                 formatCreatedAt={(date) => format(new Date(date), 'dd/MM/yyyy HH:mm')}
               />
-
-              <ReservationClientInfo client={reservation.client} />
-
-              <div>
-                <p className="text-[10px] text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Fechas:</span> {format(reservation.startDate, 'dd/MM/yyyy')} - {format(reservation.endDate, 'dd/MM/yyyy')}
-                </p>
-              </div>
-
-              <ReservationActions
-                phone={reservation.client.phone}
-                onEdit={() => onEdit(reservation)}
-                onDelete={() => onDelete(reservation.id)}
-                onWhatsAppClick={onWhatsAppClick}
-              />
+            </div>
+            <div className="text-right">
+              <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                {formatCurrency(reservation.totalAmount)}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {format(reservation.startDate, 'dd MMM yy')} - {format(reservation.endDate, 'dd MMM yy')}
+              </p>
             </div>
           </div>
-        </div>
 
-        <div className="w-64 border-l dark:border-gray-700 pl-4 space-y-1">
-          <h4 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">Detalles de Pago</h4>
-          <p className="text-[11px] font-medium text-green-600 dark:text-green-400">
-            Total: {formatCurrency(reservation.totalAmount)}
-          </p>
-          <ReservationPaymentInfo
-            paymentMethods={reservation.paymentMethods}
-            formatCurrency={formatCurrency}
+          {/* Client Info Section */}
+          <ReservationClientInfo client={reservation.client} />
+
+          {/* Payment Info Section */}
+          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Detalles de Pago
+            </h4>
+            <ReservationPaymentInfo
+              paymentMethods={reservation.paymentMethods}
+              formatCurrency={formatCurrency}
+            />
+          </div>
+
+          {/* Actions Section */}
+          <ReservationActions
+            phone={reservation.client.phone}
+            onEdit={() => onEdit(reservation)}
+            onDelete={() => onDelete(reservation.id)}
+            onWhatsAppClick={onWhatsAppClick}
           />
         </div>
       </div>
