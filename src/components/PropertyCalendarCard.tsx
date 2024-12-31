@@ -3,7 +3,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Property, Reservation } from '../types/types';
 import { DateRange } from "react-day-picker";
 import { es } from 'date-fns/locale';
-import { getDaysInMonth, startOfMonth, endOfMonth } from 'date-fns';
 
 interface PropertyCalendarCardProps {
   property: Property;
@@ -44,23 +43,6 @@ const PropertyCalendarCard = ({
     });
   };
 
-  const calculateOccupancyPercentage = (): number => {
-    const today = new Date();
-    const daysInMonth = getDaysInMonth(today);
-    const monthStart = startOfMonth(today);
-    const monthEnd = endOfMonth(today);
-    
-    let occupiedDays = 0;
-    for (let day = 1; day <= daysInMonth; day++) {
-      const currentDate = new Date(today.getFullYear(), today.getMonth(), day);
-      if (isDateBooked(currentDate)) {
-        occupiedDays++;
-      }
-    }
-    
-    return Math.round((occupiedDays / daysInMonth) * 100);
-  };
-
   const handleDayClick = (date: Date) => {
     const reservation = getReservationForDate(date);
     if (reservation) {
@@ -74,14 +56,9 @@ const PropertyCalendarCard = ({
   return (
     <Card className="max-w-md w-full">
       <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className={`w-4 h-4 rounded-full ${property.color}`} />
-            <span>{property.name}</span>
-          </div>
-          <div className="text-sm font-normal bg-muted px-2 py-1 rounded-md">
-            {calculateOccupancyPercentage()}% ocupado
-          </div>
+        <CardTitle className="flex items-center gap-2">
+          <div className={`w-4 h-4 rounded-full ${property.color}`} />
+          <span>{property.name}</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
