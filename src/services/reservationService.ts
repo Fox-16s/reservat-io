@@ -43,6 +43,7 @@ export const fetchReservationsFromDB = async () => {
     endDate: new Date(reservation.end_date),
     totalAmount: parseFloat(reservation.total_amount.toString()),
     paymentMethods: reservation.payment_methods.map((pm: any) => ({
+      id: pm.id,
       type: pm.type as 'cash' | 'card' | 'bank_transfer',
       amount: parseFloat(pm.amount.toString()),
       date: new Date(pm.payment_date),
@@ -125,34 +126,38 @@ export const updateReservationInDB = async (
 
   if (fetchError) throw fetchError;
 
-  // Compare existing payments with new ones and only update/insert what's changed
-  const existingPaymentMap = new Map(existingPayments.map(p => [
-    `${p.type}-${p.amount}-${p.payment_date}`,
-    p
-  ]));
-
-  const newPaymentMap = new Map(paymentMethods.map(p => [
-    `${p.type}-${p.amount}-${p.date.toISOString()}`,
-    p
-  ]));
-
-  // Find payments to insert (new ones)
-  const paymentsToInsert = Array.from(newPaymentMap.entries())
-    .filter(([key]) => !existingPaymentMap.has(key))
-    .map(([, payment]) => ({
-      reservation_id: reservationId,
-      type: payment.type,
-      amount: payment.amount,
-      payment_date: payment.date.toISOString(),
-    }));
-
-  // Insert new payments if any
-  if (paymentsToInsert.length > 0) {
+  // Insert new payment methods
+  const newPayments = paymentMethods.filter(pm => !pm.id);
+  if (newPayments.length > 0) {
     const { error: insertError } = await supabase
       .from('payment_methods')
-      .insert(paymentsToInsert);
+      .insert(newPayments.map(pm => ({
+        reservation_id: reservationId,
+        type: pm.type,
+        amount: pm.amount,
+        payment_date: pm.date.toISOString(),
+      })));
 
     if (insertError) throw insertError;
+  }
+
+  // Update existing payment methods
+  const existingPaymentUpdates = paymentMethods
+    .filter(pm => pm.id)
+    .map(pm => ({
+      id: pm.id,
+      type: pm.type,
+      amount: pm.amount,
+      payment_date: pm.date.toISOString(),
+    }));
+
+  for (const payment of existingPaymentUpdates) {
+    const { error: updateError } = await supabase
+      .from('payment_methods')
+      .update(payment)
+      .eq('id', payment.id);
+
+    if (updateError) throw updateError;
   }
 
   return true;
