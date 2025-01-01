@@ -154,16 +154,19 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
       />
 
       <div className="flex flex-col space-y-8">
-        <div ref={calendarContainerRef}>
-          <PropertyCalendarCard
-            property={selectedProperty}
-            reservations={reservations}
-            onSelect={handleSelect}
-            selectedDates={selectedDates}
-          />
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div ref={calendarContainerRef} className="flex-1">
+            <PropertyCalendarCard
+              property={selectedProperty}
+              reservations={reservations}
+              onSelect={handleSelect}
+              selectedDates={selectedDates}
+            />
+          </div>
+          <div className="flex-1">
+            <BankingDataCard />
+          </div>
         </div>
-
-        <BankingDataCard />
 
         <ReservationList
           reservations={filteredReservations}
