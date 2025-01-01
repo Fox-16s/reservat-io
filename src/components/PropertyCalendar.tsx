@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Property, Reservation, Client, PaymentMethod } from '../types/types';
-import ReservationList from './ReservationList';
 import { PROPERTIES, isDateRangeAvailable } from '../utils/reservationUtils';
 import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
@@ -20,8 +19,6 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
   const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
   const { toast } = useToast();
   const { reservations, createReservation, updateReservation, deleteReservation } = useReservations();
-
-  const filteredReservations = reservations.filter(r => r.propertyId === selectedPropertyId);
 
   const handleSelect = (range: DateRange | undefined) => {
     if (!range || !selectedProperty) return;
@@ -95,25 +92,6 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
     }
   };
 
-  const handleDeleteReservation = async (id: string) => {
-    const success = await deleteReservation(id);
-    if (success) {
-      toast({
-        title: "Éxito",
-        description: "Reserva eliminada correctamente",
-      });
-    }
-  };
-
-  const handleEditReservation = (reservation: Reservation) => {
-    setEditingReservation(reservation);
-    setSelectedDates({
-      from: reservation.startDate,
-      to: reservation.endDate,
-    });
-    setShowClientForm(true);
-  };
-
   if (!selectedProperty) return null;
 
   return (
@@ -125,20 +103,12 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
         onAddReservation={() => setShowClientForm(true)}
       />
 
-      <div className="flex flex-col space-y-8">
-        <CalendarSection
-          selectedProperty={selectedProperty}
-          reservations={reservations}
-          selectedDates={selectedDates}
-          onSelect={handleSelect}
-        />
-
-        <ReservationList
-          reservations={filteredReservations}
-          onDelete={handleDeleteReservation}
-          onEdit={handleEditReservation}
-        />
-      </div>
+      <CalendarSection
+        selectedProperty={selectedProperty}
+        reservations={reservations}
+        selectedDates={selectedDates}
+        onSelect={handleSelect}
+      />
 
       <ReservationDialog
         open={showClientForm}
