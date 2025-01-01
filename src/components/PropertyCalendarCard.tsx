@@ -43,12 +43,12 @@ const PropertyCalendarCard = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="relative min-h-[350px] w-full">
+        <div className="relative w-full flex justify-center">
           <Calendar
             mode="range"
             selected={selectedDates}
             onSelect={onSelect}
-            className="rounded-lg border-2 border-indigo-100 p-4 bg-white shadow-sm w-full"
+            className="rounded-lg border-2 border-indigo-100 p-3 bg-white shadow-sm max-w-fit"
             modifiers={{
               booked: (date) => isDateBooked(date),
             }}
@@ -62,9 +62,24 @@ const PropertyCalendarCard = ({
               }
             }}
             classNames={{
-              day: "h-9 w-9 p-0 font-normal text-black font-medium",
-              day_selected: "bg-blue-500 text-white hover:bg-blue-600",
-              day_today: "font-bold underline"
+              months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
+              month: "space-y-3",
+              caption: "flex justify-center pt-1 relative items-center text-sm",
+              caption_label: "text-sm font-medium",
+              nav: "space-x-1 flex items-center",
+              nav_button: "h-6 w-6 bg-transparent p-0 opacity-50 hover:opacity-100",
+              table: "w-full border-collapse space-y-1",
+              head_row: "flex",
+              head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
+              row: "flex w-full mt-1",
+              cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md",
+              day: "h-8 w-8 p-0 font-normal text-sm aria-selected:opacity-100",
+              day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+              day_today: "bg-accent text-accent-foreground",
+              day_outside: "text-muted-foreground opacity-50",
+              day_disabled: "text-muted-foreground opacity-50",
+              day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+              day_hidden: "invisible",
             }}
             locale={es}
             weekStartsOn={1}
