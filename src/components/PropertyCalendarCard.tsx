@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Property, Reservation } from '../types/types';
@@ -18,53 +17,6 @@ const PropertyCalendarCard = ({
   onSelect,
   selectedDates 
 }: PropertyCalendarCardProps) => {
-  const calendarRef = useRef<HTMLDivElement>(null);
-  const [calendarWidth, setCalendarWidth] = useState<number>(0);
-
-  useEffect(() => {
-    const currentRef = calendarRef.current;
-    if (!currentRef) return;
-
-    let animationFrameId: number;
-    let timeoutId: NodeJS.Timeout;
-
-    const handleResize = (entries: ResizeObserverEntry[]) => {
-      // Cancel any pending animation frame
-      if (animationFrameId) {
-        window.cancelAnimationFrame(animationFrameId);
-      }
-
-      // Clear any pending timeout
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-
-      // Debounce the resize handling
-      timeoutId = setTimeout(() => {
-        animationFrameId = window.requestAnimationFrame(() => {
-          const entry = entries[0];
-          if (entry) {
-            setCalendarWidth(entry.contentRect.width);
-          }
-        });
-      }, 100); // 100ms debounce
-    };
-
-    const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(currentRef);
-
-    // Cleanup function
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      if (animationFrameId) {
-        window.cancelAnimationFrame(animationFrameId);
-      }
-      resizeObserver.disconnect();
-    };
-  }, []);
-
   const isDateBooked = (date: Date): boolean => {
     const propertyReservations = reservations.filter(r => r.propertyId === property.id);
     return propertyReservations.some((r) => {
@@ -91,16 +43,12 @@ const PropertyCalendarCard = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div 
-          ref={calendarRef} 
-          className="relative"
-          style={{ minHeight: '300px' }}
-        >
+        <div className="relative min-h-[350px] w-full">
           <Calendar
             mode="range"
             selected={selectedDates}
             onSelect={onSelect}
-            className="rounded-lg border-2 border-indigo-100 p-4 bg-white shadow-sm"
+            className="rounded-lg border-2 border-indigo-100 p-4 bg-white shadow-sm w-full"
             modifiers={{
               booked: (date) => isDateBooked(date),
             }}
