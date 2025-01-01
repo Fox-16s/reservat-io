@@ -150,7 +150,6 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
         properties={[selectedProperty]}
         selectedProperty={selectedProperty}
         onPropertySelect={() => {}}
-        onAddReservation={() => setShowClientForm(true)}
       />
 
       <div className="flex flex-col space-y-8">
