@@ -5,11 +5,14 @@ import { LogOut, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PROPERTIES } from '@/utils/reservationUtils';
 
 const Index = () => {
   const navigate = useNavigate();
   const [backgroundImage, setBackgroundImage] = useState('');
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState(PROPERTIES[0].id);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -96,9 +99,28 @@ const Index = () => {
           </div>
         </div>
       </div>
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-36 lg:pt-40">
         <div className="bg-white/20 dark:bg-gray-900/20 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-md sm:shadow-xl p-3 sm:p-4 md:p-5 lg:p-6 overflow-x-auto">
-          <PropertyCalendar />
+          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full flex justify-start overflow-x-auto mb-6">
+              {PROPERTIES.map((property) => (
+                <TabsTrigger 
+                  key={property.id} 
+                  value={property.id}
+                  className="flex items-center gap-2"
+                >
+                  <div className={`w-3 h-3 rounded-full ${property.color}`} />
+                  {property.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {PROPERTIES.map((property) => (
+              <TabsContent key={property.id} value={property.id}>
+                <PropertyCalendar selectedPropertyId={property.id} />
+              </TabsContent>
+            ))}
+          </Tabs>
         </div>
       </div>
     </div>

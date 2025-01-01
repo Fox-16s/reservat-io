@@ -9,8 +9,12 @@ import CalendarHeader from './CalendarHeader';
 import ReservationDialog from './ReservationDialog';
 import { useReservations } from '@/hooks/useReservations';
 
-const PropertyCalendar = () => {
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+interface PropertyCalendarProps {
+  selectedPropertyId: string;
+}
+
+const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
+  const selectedProperty = PROPERTIES.find(p => p.id === selectedPropertyId) || null;
   const [selectedDates, setSelectedDates] = useState<DateRange | undefined>();
   const [showClientForm, setShowClientForm] = useState(false);
   const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
@@ -19,17 +23,17 @@ const PropertyCalendar = () => {
   const calendarContainerRef = useRef<HTMLDivElement>(null);
   const resizeTimeoutRef = useRef<number>();
 
+  const filteredReservations = reservations.filter(r => r.propertyId === selectedPropertyId);
+
   useEffect(() => {
     const container = calendarContainerRef.current;
     if (!container) return;
 
     const handleResize = () => {
-      // Clear any existing timeout
       if (resizeTimeoutRef.current) {
         window.clearTimeout(resizeTimeoutRef.current);
       }
 
-      // Debounce the resize event
       resizeTimeoutRef.current = window.setTimeout(() => {
         window.dispatchEvent(new Event('resize'));
       }, 100);
@@ -130,7 +134,6 @@ const PropertyCalendar = () => {
 
   const handleEditReservation = (reservation: Reservation) => {
     setEditingReservation(reservation);
-    setSelectedProperty(PROPERTIES.find(p => p.id === reservation.propertyId) || null);
     setSelectedDates({
       from: reservation.startDate,
       to: reservation.endDate,
@@ -138,37 +141,31 @@ const PropertyCalendar = () => {
     setShowClientForm(true);
   };
 
+  if (!selectedProperty) return null;
+
   return (
-    <div className="space-y-8 p-8">
+    <div className="space-y-8">
       <CalendarHeader
-        properties={PROPERTIES}
+        properties={[selectedProperty]}
         selectedProperty={selectedProperty}
-        onPropertySelect={setSelectedProperty}
+        onPropertySelect={() => {}}
         onAddReservation={() => setShowClientForm(true)}
       />
 
-      <div ref={calendarContainerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {PROPERTIES.map((property) => (
-          <PropertyCalendarCard
-            key={property.id}
-            property={property}
-            reservations={reservations}
-            onSelect={(range) => {
-              setSelectedProperty(property);
-              handleSelect(range);
-            }}
-            selectedDates={selectedProperty?.id === property.id ? selectedDates : undefined}
-          />
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 gap-8">
-        <ReservationList
+      <div ref={calendarContainerRef}>
+        <PropertyCalendarCard
+          property={selectedProperty}
           reservations={reservations}
-          onDelete={handleDeleteReservation}
-          onEdit={handleEditReservation}
+          onSelect={handleSelect}
+          selectedDates={selectedDates}
         />
       </div>
+
+      <ReservationList
+        reservations={filteredReservations}
+        onDelete={handleDeleteReservation}
+        onEdit={handleEditReservation}
+      />
 
       <ReservationDialog
         open={showClientForm}
