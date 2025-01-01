@@ -7,12 +7,14 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PROPERTIES } from '@/utils/reservationUtils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
   const navigate = useNavigate();
   const [backgroundImage, setBackgroundImage] = useState('');
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(PROPERTIES[0].id);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -81,7 +83,7 @@ const Index = () => {
                 alt="Reservat.io" 
                 className="h-12 sm:h-14 md:h-16 lg:h-20 w-auto rounded-lg"
               />
-              {userEmail && (
+              {userEmail && !isMobile && (
                 <div className="flex items-center gap-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm px-4 py-2 rounded-lg">
                   <User className="h-4 w-4" />
                   <span className="text-sm font-medium">{userEmail}</span>
@@ -94,7 +96,7 @@ const Index = () => {
               className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm"
             >
               <LogOut className="mr-2 h-4 w-4" />
-              Logout
+              {!isMobile && "Logout"}
             </Button>
           </div>
         </div>
@@ -102,10 +104,8 @@ const Index = () => {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-36 lg:pt-40">
         <div className="relative overflow-hidden">
-          {/* Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 dark:from-purple-900/20 dark:to-indigo-900/20 pointer-events-none" />
           
-          {/* Main content container with enhanced styling */}
           <div className="relative bg-white/30 dark:bg-gray-900/30 backdrop-blur-md rounded-xl 
             shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.24)]
             border border-white/20 dark:border-gray-800/30
