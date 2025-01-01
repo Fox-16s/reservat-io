@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Property, Reservation } from '../types/types';
@@ -19,25 +19,49 @@ const PropertyCalendarCard = ({
   selectedDates 
 }: PropertyCalendarCardProps) => {
   const calendarRef = useRef<HTMLDivElement>(null);
+  const [calendarWidth, setCalendarWidth] = useState<number>(0);
 
   useEffect(() => {
     const currentRef = calendarRef.current;
     if (!currentRef) return;
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      // Handle resize if needed
-      window.requestAnimationFrame(() => {
-        // Ensure smooth animations
-      });
-    });
+    let animationFrameId: number;
+    let timeoutId: NodeJS.Timeout;
 
+    const handleResize = (entries: ResizeObserverEntry[]) => {
+      // Cancel any pending animation frame
+      if (animationFrameId) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+
+      // Clear any pending timeout
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      // Debounce the resize handling
+      timeoutId = setTimeout(() => {
+        animationFrameId = window.requestAnimationFrame(() => {
+          const entry = entries[0];
+          if (entry) {
+            setCalendarWidth(entry.contentRect.width);
+          }
+        });
+      }, 100); // 100ms debounce
+    };
+
+    const resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(currentRef);
 
+    // Cleanup function
     return () => {
-      if (currentRef) {
-        resizeObserver.unobserve(currentRef);
-        resizeObserver.disconnect();
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
+      if (animationFrameId) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+      resizeObserver.disconnect();
     };
   }, []);
 
@@ -67,7 +91,11 @@ const PropertyCalendarCard = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div ref={calendarRef} className="relative">
+        <div 
+          ref={calendarRef} 
+          className="relative"
+          style={{ minHeight: '300px' }}
+        >
           <Calendar
             mode="range"
             selected={selectedDates}
