@@ -21,6 +21,7 @@ import ReservationClientInfo from './reservation/ReservationClientInfo';
 import ReservationPaymentInfo from './reservation/ReservationPaymentInfo';
 import ReservationActions from './reservation/ReservationActions';
 import { useToast } from './ui/use-toast';
+import { Separator } from './ui/separator';
 
 interface ReservationListProps {
   reservations: Reservation[];
@@ -115,8 +116,9 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                      hover:border-primary/30 dark:hover:border-primary/30
                      hover:scale-[1.01] transform"
           >
-            <div className="flex justify-between gap-4">
-              <div className="flex-1 space-y-1.5">
+            <div className="flex flex-col gap-2">
+              {/* Reservation Details Section */}
+              <div className="space-y-1.5">
                 <div className="flex items-start gap-1.5">
                   <div className="flex items-center h-full">
                     <Checkbox
@@ -159,7 +161,11 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                 </div>
               </div>
 
-              <div className="w-64 border-l dark:border-gray-700 pl-4 space-y-1">
+              {/* Separator */}
+              <Separator className="my-2" />
+
+              {/* Payment Details Section */}
+              <div className="space-y-1">
                 <h4 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">Detalles de Pago</h4>
                 <ReservationPaymentInfo
                   paymentMethods={reservation.paymentMethods}
