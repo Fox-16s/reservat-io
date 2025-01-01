@@ -8,10 +8,10 @@ interface CardPaymentInfoProps {
 }
 
 const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) => {
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
-      currency: 'ARS'
+      currency
     }).format(amount);
   };
 
@@ -28,7 +28,11 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
     }
   };
 
-  const totalPaid = paymentMethods.reduce((sum, payment) => sum + payment.amount, 0);
+  const totalPaid = paymentMethods.reduce((sum, payment) => {
+    // Convert USD to ARS for total calculation (using a fixed rate for simplicity)
+    const rate = payment.currency === 'USD' ? 850 : 1;
+    return sum + (payment.amount * rate);
+  }, 0);
   const remainingAmount = totalAmount - totalPaid;
 
   return (
@@ -38,7 +42,7 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
           Detalles de Pago
         </h4>
         <p className="text-lg font-semibold text-green-600 dark:text-green-400">
-          {formatCurrency(totalAmount)}
+          {formatCurrency(totalAmount, 'ARS')}
         </p>
       </div>
       <div className="space-y-1">
@@ -63,7 +67,7 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
               </div>
             </div>
             <span className="text-sm font-medium dark:text-gray-300">
-              {formatCurrency(payment.amount)}
+              {formatCurrency(payment.amount, payment.currency)}
             </span>
           </div>
         ))}
@@ -72,13 +76,13 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium dark:text-gray-300">Total Pagado:</span>
             <span className="text-sm font-medium text-green-600 dark:text-green-400">
-              {formatCurrency(totalPaid)}
+              {formatCurrency(totalPaid, 'ARS')}
             </span>
           </div>
           <div className="flex justify-between items-center mt-1">
             <span className="text-sm font-medium dark:text-gray-300">Restante:</span>
             <span className={`text-sm font-medium ${remainingAmount > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-              {formatCurrency(remainingAmount)}
+              {formatCurrency(remainingAmount, 'ARS')}
             </span>
           </div>
         </div>

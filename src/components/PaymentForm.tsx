@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PaymentMethod } from '../types/types';
 import { CreditCard, Building2, Banknote } from 'lucide-react';
 
@@ -24,6 +25,11 @@ const PaymentForm = ({
     card: initialPaymentMethods.find(p => p.type === 'card')?.amount.toString() || '',
     bank_transfer: initialPaymentMethods.find(p => p.type === 'bank_transfer')?.amount.toString() || '',
   });
+  const [currencies, setCurrencies] = useState<{ [key: string]: 'ARS' | 'USD' }>({
+    cash: initialPaymentMethods.find(p => p.type === 'cash')?.currency || 'ARS',
+    card: initialPaymentMethods.find(p => p.type === 'card')?.currency || 'ARS',
+    bank_transfer: initialPaymentMethods.find(p => p.type === 'bank_transfer')?.currency || 'ARS',
+  });
 
   const handlePaymentMethodChange = (method: 'cash' | 'card' | 'bank_transfer', amount: string) => {
     setPaymentAmounts(prev => ({ ...prev, [method]: amount }));
@@ -38,6 +44,7 @@ const PaymentForm = ({
         updatedMethods[existingMethodIndex] = {
           ...updatedMethods[existingMethodIndex],
           amount: numAmount,
+          currency: currencies[method],
         };
       } else {
         // Remove payment method if amount is 0
@@ -48,12 +55,29 @@ const PaymentForm = ({
       updatedMethods.push({ 
         type: method, 
         amount: numAmount,
-        date: new Date()
+        date: new Date(),
+        currency: currencies[method],
       });
     }
     
     setPaymentMethods(updatedMethods);
     onPaymentMethodsChange(updatedMethods);
+  };
+
+  const handleCurrencyChange = (method: 'cash' | 'card' | 'bank_transfer', currency: 'ARS' | 'USD') => {
+    setCurrencies(prev => ({ ...prev, [method]: currency }));
+    
+    // Update existing payment method if it exists
+    const existingMethodIndex = paymentMethods.findIndex(p => p.type === method);
+    if (existingMethodIndex >= 0 && paymentMethods[existingMethodIndex].amount > 0) {
+      const updatedMethods = [...paymentMethods];
+      updatedMethods[existingMethodIndex] = {
+        ...updatedMethods[existingMethodIndex],
+        currency,
+      };
+      setPaymentMethods(updatedMethods);
+      onPaymentMethodsChange(updatedMethods);
+    }
   };
 
   const handleTotalAmountChange = (value: string) => {
@@ -79,45 +103,39 @@ const PaymentForm = ({
       <div className="space-y-4">
         <Label className="text-lg font-semibold text-gray-700 dark:text-gray-200">Métodos de Pago</Label>
         <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <Input
-              type="number"
-              value={paymentAmounts.cash}
-              onChange={(e) => handlePaymentMethodChange('cash', e.target.value)}
-              placeholder="0.00"
-              className="border-2 border-indigo-100 dark:border-indigo-800 focus:border-indigo-300"
-            />
-            <div className="flex items-center gap-2 min-w-[120px] text-gray-700 dark:text-gray-200">
-              <Banknote className="h-4 w-4" />
-              <Label>Efectivo</Label>
+          {[
+            { type: 'cash' as const, icon: Banknote, label: 'Efectivo' },
+            { type: 'card' as const, icon: CreditCard, label: 'Tarjeta' },
+            { type: 'bank_transfer' as const, icon: Building2, label: 'Transferencia' }
+          ].map(({ type, icon: Icon, label }) => (
+            <div key={type} className="flex items-center gap-4">
+              <div className="flex-1">
+                <Input
+                  type="number"
+                  value={paymentAmounts[type]}
+                  onChange={(e) => handlePaymentMethodChange(type, e.target.value)}
+                  placeholder="0.00"
+                  className="border-2 border-indigo-100 dark:border-indigo-800 focus:border-indigo-300"
+                />
+              </div>
+              <Select
+                value={currencies[type]}
+                onValueChange={(value: 'ARS' | 'USD') => handleCurrencyChange(type, value)}
+              >
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ARS">ARS</SelectItem>
+                  <SelectItem value="USD">USD</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="flex items-center gap-2 min-w-[120px] text-gray-700 dark:text-gray-200">
+                <Icon className="h-4 w-4" />
+                <Label>{label}</Label>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Input
-              type="number"
-              value={paymentAmounts.card}
-              onChange={(e) => handlePaymentMethodChange('card', e.target.value)}
-              placeholder="0.00"
-              className="border-2 border-indigo-100 dark:border-indigo-800 focus:border-indigo-300"
-            />
-            <div className="flex items-center gap-2 min-w-[120px] text-gray-700 dark:text-gray-200">
-              <CreditCard className="h-4 w-4" />
-              <Label>Tarjeta</Label>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <Input
-              type="number"
-              value={paymentAmounts.bank_transfer}
-              onChange={(e) => handlePaymentMethodChange('bank_transfer', e.target.value)}
-              placeholder="0.00"
-              className="border-2 border-indigo-100 dark:border-indigo-800 focus:border-indigo-300"
-            />
-            <div className="flex items-center gap-2 min-w-[120px] text-gray-700 dark:text-gray-200">
-              <Building2 className="h-4 w-4" />
-              <Label>Transferencia</Label>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>
