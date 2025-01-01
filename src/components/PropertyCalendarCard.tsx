@@ -35,7 +35,7 @@ const PropertyCalendarCard = ({
   }
 
   return (
-    <Card className="w-full">
+    <Card className="max-w-fit mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <div className={`w-4 h-4 rounded-full ${property.color}`} />
@@ -43,12 +43,12 @@ const PropertyCalendarCard = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="relative w-full flex justify-center">
+        <div className="flex justify-center">
           <Calendar
             mode="range"
             selected={selectedDates}
             onSelect={onSelect}
-            className="rounded-lg border-2 border-indigo-100 p-3 bg-white shadow-sm max-w-fit"
+            className="rounded-lg border-2 border-indigo-100 p-3 bg-white shadow-sm"
             modifiers={{
               booked: (date) => isDateBooked(date),
             }}
