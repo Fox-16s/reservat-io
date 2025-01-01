@@ -22,28 +22,28 @@ const AuthForm = () => {
       } else if (event === 'TOKEN_REFRESHED') {
         console.log('Token refreshed');
       }
-    });
 
-    // Listen for auth errors
-    const authListener = supabase.auth.onError((error: AuthError) => {
-      console.error('Auth error:', error);
-      
-      if (error.message.includes('Invalid login credentials')) {
-        toast.error('Invalid email or password. Please try again.');
-      } else if (error.message.includes('Email not confirmed')) {
-        toast.error('Please verify your email address before signing in.');
-      } else if (error.message.includes('Email rate limit exceeded')) {
-        toast.error('Too many attempts. Please try again later.');
-      } else if (error.message.includes('Password is too weak')) {
-        toast.error('Password should be at least 6 characters long.');
-      } else {
-        toast.error('An error occurred. Please try again.');
+      // Handle auth errors for any event
+      const error = session as unknown as { error: AuthError };
+      if (error?.error) {
+        console.error('Auth error:', error.error);
+        
+        if (error.error.message.includes('Invalid login credentials')) {
+          toast.error('Invalid email or password. Please try again.');
+        } else if (error.error.message.includes('Email not confirmed')) {
+          toast.error('Please verify your email address before signing in.');
+        } else if (error.error.message.includes('Email rate limit exceeded')) {
+          toast.error('Too many attempts. Please try again later.');
+        } else if (error.error.message.includes('Password is too weak')) {
+          toast.error('Password should be at least 6 characters long.');
+        } else {
+          toast.error('An error occurred. Please try again.');
+        }
       }
     });
 
     return () => {
       subscription.unsubscribe();
-      authListener.data.subscription.unsubscribe();
     };
   }, []);
 
