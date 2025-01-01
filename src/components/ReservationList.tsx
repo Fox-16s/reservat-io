@@ -153,12 +153,10 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
 
               <div className="w-64 border-l dark:border-gray-700 pl-4 space-y-1">
                 <h4 className="text-[10px] font-medium text-gray-700 dark:text-gray-300">Detalles de Pago</h4>
-                <p className="text-[11px] font-medium text-green-600 dark:text-green-400">
-                  Total: {formatCurrency(reservation.totalAmount)}
-                </p>
                 <ReservationPaymentInfo
                   paymentMethods={reservation.paymentMethods}
                   formatCurrency={formatCurrency}
+                  totalAmount={reservation.totalAmount}
                 />
               </div>
             </div>
