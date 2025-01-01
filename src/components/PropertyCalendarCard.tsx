@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Property, Reservation } from '../types/types';
 import { DateRange } from "react-day-picker";
 import { es } from 'date-fns/locale';
+import { isSameMonth } from 'date-fns';
 
 interface PropertyCalendarCardProps {
   property: Property;
@@ -11,12 +12,32 @@ interface PropertyCalendarCardProps {
   selectedDates?: DateRange;
 }
 
+const RESERVATION_COLORS = [
+  'bg-[#ea384c]',  // Original red
+  'bg-[#3b82f6]',  // Blue
+  'bg-[#22c55e]',  // Green
+  'bg-[#f59e0b]',  // Yellow
+  'bg-[#8b5cf6]',  // Purple
+];
+
 const PropertyCalendarCard = ({ 
   property, 
   reservations, 
   onSelect,
   selectedDates,
 }: PropertyCalendarCardProps) => {
+  const getReservationColor = (date: Date): string => {
+    const propertyReservations = reservations
+      .filter(r => r.propertyId === property.id)
+      .filter(r => isSameMonth(r.startDate, date));
+    
+    const reservation = getReservationForDate(date);
+    if (!reservation) return '';
+
+    const index = propertyReservations.findIndex(r => r.id === reservation.id);
+    return RESERVATION_COLORS[index % RESERVATION_COLORS.length];
+  };
+
   const isDateBooked = (date: Date): boolean => {
     const propertyReservations = reservations.filter(r => r.propertyId === property.id);
     return propertyReservations.some((r) => {
@@ -53,6 +74,13 @@ const PropertyCalendarCard = ({
     }
   };
 
+  const modifiersStyles = {
+    booked: (date: Date) => ({
+      color: 'white',
+      backgroundColor: getReservationColor(date) || '#ea384c',
+    }),
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -70,15 +98,7 @@ const PropertyCalendarCard = ({
           modifiers={{
             booked: (date) => isDateBooked(date),
           }}
-          modifiersStyles={{
-            booked: {
-              color: 'white',
-              backgroundColor: '#ea384c',
-            },
-            default: {
-              backgroundColor: '#F2FCE2',
-            }
-          }}
+          modifiersStyles={modifiersStyles}
           classNames={{
             day: "h-9 w-9 p-0 font-normal text-black font-medium cursor-pointer",
             day_selected: "bg-blue-500 text-white hover:bg-blue-600",
