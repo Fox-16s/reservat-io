@@ -70,15 +70,6 @@ const ReservationPaymentInfo = ({
         return;
       }
 
-      if (numAmount > remainingAmount) {
-        toast({
-          title: "Error",
-          description: "El monto no puede ser mayor al restante",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const { error } = await supabase
         .from('payment_methods')
         .insert({
@@ -154,69 +145,67 @@ const ReservationPaymentInfo = ({
           </div>
         ))}
 
-        {remainingAmount > 0 && (
-          <div>
-            {!isAddingPayment ? (
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full text-[10px]"
-                onClick={() => setIsAddingPayment(true)}
-              >
-                <Plus className="h-3 w-3 mr-1" />
-                Agregar Pago
-              </Button>
-            ) : (
-              <div className="space-y-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
-                <div className="space-y-1">
-                  <Label className="text-[10px]">Tipo de Pago</Label>
-                  <Select
-                    value={paymentType}
-                    onValueChange={(value: 'cash' | 'card' | 'bank_transfer') => setPaymentType(value)}
-                  >
-                    <SelectTrigger className="h-8 text-[10px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cash">Efectivo</SelectItem>
-                      <SelectItem value="card">Tarjeta</SelectItem>
-                      <SelectItem value="bank_transfer">Transferencia</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1">
-                  <Label className="text-[10px]">Monto</Label>
-                  <Input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="h-8 text-[10px]"
-                    placeholder={`Máximo: ${formatCurrency(remainingAmount)}`}
-                  />
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 text-[10px]"
-                    onClick={() => setIsAddingPayment(false)}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="flex-1 text-[10px]"
-                    onClick={handleAddPayment}
-                  >
-                    Confirmar
-                  </Button>
-                </div>
+        <div>
+          {!isAddingPayment ? (
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full text-[10px]"
+              onClick={() => setIsAddingPayment(true)}
+            >
+              <Plus className="h-3 w-3 mr-1" />
+              Agregar Pago
+            </Button>
+          ) : (
+            <div className="space-y-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+              <div className="space-y-1">
+                <Label className="text-[10px]">Tipo de Pago</Label>
+                <Select
+                  value={paymentType}
+                  onValueChange={(value: 'cash' | 'card' | 'bank_transfer') => setPaymentType(value)}
+                >
+                  <SelectTrigger className="h-8 text-[10px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cash">Efectivo</SelectItem>
+                    <SelectItem value="card">Tarjeta</SelectItem>
+                    <SelectItem value="bank_transfer">Transferencia</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-          </div>
-        )}
+
+              <div className="space-y-1">
+                <Label className="text-[10px]">Monto</Label>
+                <Input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="h-8 text-[10px]"
+                  placeholder="Ingrese el monto"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 text-[10px]"
+                  onClick={() => setIsAddingPayment(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1 text-[10px]"
+                  onClick={handleAddPayment}
+                >
+                  Confirmar
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
