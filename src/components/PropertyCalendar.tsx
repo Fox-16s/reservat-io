@@ -1,14 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Property, Reservation, Client, PaymentMethod } from '../types/types';
 import ReservationList from './ReservationList';
-import PropertyCalendarCard from './PropertyCalendarCard';
 import { PROPERTIES, isDateRangeAvailable } from '../utils/reservationUtils';
 import { useToast } from "@/components/ui/use-toast";
 import { DateRange } from "react-day-picker";
 import CalendarHeader from './CalendarHeader';
 import ReservationDialog from './ReservationDialog';
 import { useReservations } from '@/hooks/useReservations';
-import BankingDataCard from './BankingDataCard';
+import CalendarSection from './calendar/CalendarSection';
 
 interface PropertyCalendarProps {
   selectedPropertyId: string;
@@ -21,52 +20,8 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
   const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
   const { toast } = useToast();
   const { reservations, createReservation, updateReservation, deleteReservation } = useReservations();
-  const calendarContainerRef = useRef<HTMLDivElement>(null);
-  const resizeTimeoutRef = useRef<number>();
 
   const filteredReservations = reservations.filter(r => r.propertyId === selectedPropertyId);
-
-  useEffect(() => {
-    const container = calendarContainerRef.current;
-    if (!container) return;
-
-    let isResizing = false;
-    const resizeObserver = new ResizeObserver((entries) => {
-      if (isResizing) return;
-      
-      isResizing = true;
-      if (resizeTimeoutRef.current) {
-        window.clearTimeout(resizeTimeoutRef.current);
-      }
-
-      resizeTimeoutRef.current = window.setTimeout(() => {
-        try {
-          window.dispatchEvent(new Event('resize'));
-        } catch (error) {
-          console.error('Error dispatching resize event:', error);
-        } finally {
-          isResizing = false;
-        }
-      }, 100);
-    });
-
-    try {
-      resizeObserver.observe(container);
-    } catch (error) {
-      console.error('Error observing container:', error);
-    }
-
-    return () => {
-      if (resizeTimeoutRef.current) {
-        window.clearTimeout(resizeTimeoutRef.current);
-      }
-      try {
-        resizeObserver.disconnect();
-      } catch (error) {
-        console.error('Error disconnecting observer:', error);
-      }
-    };
-  }, []);
 
   const handleSelect = (range: DateRange | undefined) => {
     if (!range || !selectedProperty) return;
@@ -171,19 +126,12 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
       />
 
       <div className="flex flex-col space-y-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div ref={calendarContainerRef} className="flex-1">
-            <PropertyCalendarCard
-              property={selectedProperty}
-              reservations={reservations}
-              onSelect={handleSelect}
-              selectedDates={selectedDates}
-            />
-          </div>
-          <div className="flex-1">
-            <BankingDataCard />
-          </div>
-        </div>
+        <CalendarSection
+          selectedProperty={selectedProperty}
+          reservations={reservations}
+          selectedDates={selectedDates}
+          onSelect={handleSelect}
+        />
 
         <ReservationList
           reservations={filteredReservations}
