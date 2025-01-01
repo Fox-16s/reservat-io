@@ -9,6 +9,24 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      "google maps location": {
+        Row: {
+          Coordenadas: string | null
+          created_at: string
+          id: number
+        }
+        Insert: {
+          Coordenadas?: string | null
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          Coordenadas?: string | null
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       payment_methods: {
         Row: {
           amount: number

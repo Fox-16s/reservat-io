@@ -1,11 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Client, PaymentMethod } from '../types/types';
 import { DateRange } from "react-day-picker";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 export const useReservationMutations = () => {
-  const { toast } = useToast();
-
   const createReservation = async (
     propertyId: string,
     client: Client,
@@ -51,6 +49,11 @@ export const useReservationMutations = () => {
         if (paymentError) throw paymentError;
       }
 
+      toast({
+        title: "Éxito",
+        description: "Reserva creada correctamente",
+      });
+
       return true;
     } catch (error: any) {
       console.error('Error creating reservation:', error);
@@ -91,6 +94,11 @@ export const useReservationMutations = () => {
 
       if (reservationError) throw reservationError;
 
+      toast({
+        title: "Éxito",
+        description: "Reserva actualizada correctamente",
+      });
+
       return true;
     } catch (error: any) {
       console.error('Error updating reservation:', error);
@@ -111,6 +119,11 @@ export const useReservationMutations = () => {
         .eq('id', id);
 
       if (error) throw error;
+
+      toast({
+        title: "Éxito",
+        description: "Reserva eliminada correctamente",
+      });
 
       return true;
     } catch (error: any) {
