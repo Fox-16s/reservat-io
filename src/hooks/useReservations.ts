@@ -17,7 +17,17 @@ export const useReservations = (): ReservationHookReturn => {
   const fetchReservations = async () => {
     try {
       const reservationsData = await fetchReservationsFromDB();
-      setReservations(reservationsData);
+      const formattedReservations = reservationsData.map(reservation => ({
+        ...reservation,
+        paymentMethods: reservation.payment_methods.map((pm: any) => ({
+          id: pm.id,
+          type: pm.type as 'cash' | 'card' | 'bank_transfer',
+          amount: parseFloat(pm.amount.toString()),
+          date: new Date(pm.payment_date),
+          currency: pm.currency || 'ARS' // Add default currency if not present
+        }))
+      }));
+      setReservations(formattedReservations);
     } catch (error: any) {
       console.error('Error fetching reservations:', error);
       toast({

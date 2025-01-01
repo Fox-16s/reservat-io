@@ -43,7 +43,8 @@ const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: 
       updatedMethods.push({ 
         type: method, 
         amount: numAmount,
-        date: new Date()
+        date: new Date(),
+        currency: 'ARS' // Default to ARS for now
       });
     }
     
