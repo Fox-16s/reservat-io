@@ -19,12 +19,11 @@ const CalendarSection = ({
   onSelect,
 }: CalendarSectionProps) => {
   const calendarContainerRef = useRef<HTMLDivElement>(null);
-  // Always call useCalendarResize, regardless of conditions
   useCalendarResize(calendarContainerRef);
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
-      <div ref={calendarContainerRef} className="flex-1">
+      <div ref={calendarContainerRef} className="flex-[2]">
         <PropertyCalendarCard
           property={selectedProperty}
           reservations={reservations}
