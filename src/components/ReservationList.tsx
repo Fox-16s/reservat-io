@@ -91,11 +91,10 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
     }
   };
 
-  const handleEditPayment = (reservation: Reservation) => {
-    onEdit(reservation);
+  const handlePaymentAdded = () => {
     toast({
-      title: "Editar Pago",
-      description: "Editando el pago de la reserva",
+      title: "Pago agregado",
+      description: "El pago se ha registrado correctamente",
     });
   };
 
@@ -166,7 +165,8 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                   paymentMethods={reservation.paymentMethods}
                   formatCurrency={formatCurrency}
                   totalAmount={reservation.totalAmount}
-                  onEditPayment={() => handleEditPayment(reservation)}
+                  reservationId={reservation.id}
+                  onPaymentAdded={handlePaymentAdded}
                 />
               </div>
             </div>
