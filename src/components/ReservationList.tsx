@@ -20,7 +20,7 @@ import ReservationHeader from './reservation/ReservationHeader';
 import ReservationClientInfo from './reservation/ReservationClientInfo';
 import ReservationPaymentInfo from './reservation/ReservationPaymentInfo';
 import ReservationActions from './reservation/ReservationActions';
-import { Separator } from './ui/separator';
+import { useToast } from './ui/use-toast';
 
 interface ReservationListProps {
   reservations: Reservation[];
@@ -36,6 +36,7 @@ interface UserInfo {
 const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProps) => {
   const [selectedReservation, setSelectedReservation] = useState<string | null>(null);
   const [userInfoMap, setUserInfoMap] = useState<Record<string, UserInfo>>({});
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -88,6 +89,14 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
       onDelete(selectedReservation);
       setSelectedReservation(null);
     }
+  };
+
+  const handleEditPayment = (reservation: Reservation) => {
+    onEdit(reservation);
+    toast({
+      title: "Editar Pago",
+      description: "Editando el pago de la reserva",
+    });
   };
 
   const sortedReservations = [...reservations].sort(
@@ -157,6 +166,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                   paymentMethods={reservation.paymentMethods}
                   formatCurrency={formatCurrency}
                   totalAmount={reservation.totalAmount}
+                  onEditPayment={() => handleEditPayment(reservation)}
                 />
               </div>
             </div>
