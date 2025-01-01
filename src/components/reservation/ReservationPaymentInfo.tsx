@@ -60,6 +60,8 @@ const ReservationPaymentInfo = ({
       });
 
       setIsAddingPayment(false);
+      
+      // Call onPaymentAdded to refresh the data
       onPaymentAdded();
     } catch (error) {
       console.error('Error adding payment:', error);
