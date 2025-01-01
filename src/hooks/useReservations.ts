@@ -140,6 +140,7 @@ export const useReservations = () => {
 
       if (!dateRange.from || !dateRange.to) return;
 
+      // Only update client and date information, preserving payment details
       const { error: reservationError } = await supabase
         .from('reservations')
         .update({
@@ -148,31 +149,10 @@ export const useReservations = () => {
           client_notes: client.notes,
           start_date: dateRange.from.toISOString(),
           end_date: dateRange.to.toISOString(),
-          total_amount: totalAmount,
         })
         .eq('id', reservationId);
 
       if (reservationError) throw reservationError;
-
-      const { error: deleteError } = await supabase
-        .from('payment_methods')
-        .delete()
-        .eq('reservation_id', reservationId);
-
-      if (deleteError) throw deleteError;
-
-      if (paymentMethods.length > 0) {
-        const { error: paymentError } = await supabase
-          .from('payment_methods')
-          .insert(paymentMethods.map(pm => ({
-            reservation_id: reservationId,
-            type: pm.type,
-            amount: pm.amount,
-            payment_date: pm.date.toISOString(),
-          })));
-
-        if (paymentError) throw paymentError;
-      }
 
       await fetchReservations();
       return true;
