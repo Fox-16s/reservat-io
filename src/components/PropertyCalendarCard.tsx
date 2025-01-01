@@ -21,10 +21,21 @@ const PropertyCalendarCard = ({
   const calendarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Cleanup function for ResizeObserver
+    const currentRef = calendarRef.current;
+    if (!currentRef) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      // Handle resize if needed
+      window.requestAnimationFrame(() => {
+        // Ensure smooth animations
+      });
+    });
+
+    resizeObserver.observe(currentRef);
+
     return () => {
-      if (calendarRef.current) {
-        const resizeObserver = new ResizeObserver(() => {});
+      if (currentRef) {
+        resizeObserver.unobserve(currentRef);
         resizeObserver.disconnect();
       }
     };
@@ -56,7 +67,7 @@ const PropertyCalendarCard = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div ref={calendarRef}>
+        <div ref={calendarRef} className="relative">
           <Calendar
             mode="range"
             selected={selectedDates}
