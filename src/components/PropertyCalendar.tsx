@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Property, Reservation, Client, PaymentMethod } from '../types/types';
 import ReservationList from './ReservationList';
 import PropertyCalendarCard from './PropertyCalendarCard';
@@ -16,6 +16,18 @@ const PropertyCalendar = () => {
   const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
   const { toast } = useToast();
   const { reservations, createReservation, updateReservation, deleteReservation } = useReservations();
+
+  // Add cleanup for ResizeObserver
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      // Handle resize if needed
+    });
+
+    // Cleanup function
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   const handleSelect = (range: DateRange | undefined) => {
     if (!range || !selectedProperty) return;
