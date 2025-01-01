@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Property, Reservation } from '../types/types';
 import { DateRange } from "react-day-picker";
 import { es } from 'date-fns/locale';
-import { isSameMonth } from 'date-fns';
+import { isSameMonth, startOfMonth } from 'date-fns';
 
 interface PropertyCalendarCardProps {
   property: Property;
@@ -13,7 +13,7 @@ interface PropertyCalendarCardProps {
 }
 
 const RESERVATION_COLORS = [
-  'bg-[#ea384c]',  // Original red
+  'bg-[#ea384c]',  // Red
   'bg-[#3b82f6]',  // Blue
   'bg-[#22c55e]',  // Green
   'bg-[#f59e0b]',  // Yellow
@@ -27,9 +27,11 @@ const PropertyCalendarCard = ({
   selectedDates,
 }: PropertyCalendarCardProps) => {
   const getReservationColor = (date: Date): string => {
+    const monthStart = startOfMonth(date);
     const propertyReservations = reservations
       .filter(r => r.propertyId === property.id)
-      .filter(r => isSameMonth(r.startDate, date));
+      .filter(r => isSameMonth(r.startDate, monthStart))
+      .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
     
     const reservation = getReservationForDate(date);
     if (!reservation) return '';
