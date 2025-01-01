@@ -12,9 +12,16 @@ interface ReservationFormProps {
   onCancel: () => void;
   initialDateRange?: DateRange;
   initialData?: Client;
+  isEditing?: boolean;
 }
 
-const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: ReservationFormProps) => {
+const ReservationForm = ({ 
+  onSubmit, 
+  onCancel, 
+  initialDateRange, 
+  initialData,
+  isEditing = false 
+}: ReservationFormProps) => {
   const [step, setStep] = useState(1);
   const [client, setClient] = useState<Client>({ name: '', phone: '', notes: '' });
   const [dateRange, setDateRange] = useState<DateRange | undefined>(initialDateRange);
@@ -67,11 +74,24 @@ const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: 
       });
       return;
     }
-    setStep(2);
+    if (!isEditing) {
+      setStep(2);
+    } else {
+      handleSubmit();
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    
+    if (isEditing) {
+      // When editing, just submit with the existing data
+      onSubmit(client, dateRange, 0, []);
+      return;
+    }
+
     if (!totalAmount || parseFloat(totalAmount) <= 0) {
       toast({
         title: "Error",
@@ -117,7 +137,7 @@ const ReservationForm = ({ onSubmit, onCancel, initialDateRange, initialData }: 
               className="text-sm bg-indigo-600 hover:bg-indigo-700"
               tabIndex={9}
             >
-              Siguiente
+              {isEditing ? 'Confirmar' : 'Siguiente'}
             </Button>
           </div>
         </>

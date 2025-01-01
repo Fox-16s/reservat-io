@@ -41,6 +41,7 @@ const ReservationDialog = ({
           onCancel={onCancel}
           initialDateRange={selectedDates}
           initialData={editingReservation?.client}
+          isEditing={!!editingReservation}
         />
       </DialogContent>
     </Dialog>
