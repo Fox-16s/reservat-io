@@ -17,7 +17,9 @@ const PaymentNotes = ({ reservationId, initialNotes }: PaymentNotesProps) => {
     try {
       const { error } = await supabase
         .from('reservations')
-        .update({ payment_notes: value })
+        .update({
+          payment_notes: value
+        })
         .eq('id', reservationId);
 
       if (error) throw error;

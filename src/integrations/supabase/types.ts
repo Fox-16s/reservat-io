@@ -97,6 +97,7 @@ export type Database = {
           created_at: string
           end_date: string
           id: string
+          payment_notes: string | null
           property_id: string
           start_date: string
           total_amount: number
@@ -109,6 +110,7 @@ export type Database = {
           created_at?: string
           end_date: string
           id?: string
+          payment_notes?: string | null
           property_id: string
           start_date: string
           total_amount: number
@@ -121,6 +123,7 @@ export type Database = {
           created_at?: string
           end_date?: string
           id?: string
+          payment_notes?: string | null
           property_id?: string
           start_date?: string
           total_amount?: number
