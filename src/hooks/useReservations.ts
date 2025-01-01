@@ -17,9 +17,9 @@ export const useReservations = (): ReservationHookReturn => {
   const fetchReservations = async () => {
     try {
       const reservationsData = await fetchReservationsFromDB();
-      const formattedReservations = reservationsData.map(reservation => ({
+      const formattedReservations = reservationsData.map((reservation: any) => ({
         ...reservation,
-        paymentMethods: reservation.payment_methods.map((pm: any) => ({
+        paymentMethods: reservation.paymentMethods.map((pm: any) => ({
           id: pm.id,
           type: pm.type as 'cash' | 'card' | 'bank_transfer',
           amount: parseFloat(pm.amount.toString()),
