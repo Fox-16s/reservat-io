@@ -24,7 +24,8 @@ export const fetchReservationsFromDB = async () => {
         id,
         type,
         amount,
-        payment_date
+        payment_date,
+        currency
       )
     `);
 
@@ -47,6 +48,7 @@ export const fetchReservationsFromDB = async () => {
       type: pm.type as 'cash' | 'card' | 'bank_transfer',
       amount: parseFloat(pm.amount.toString()),
       date: new Date(pm.payment_date),
+      currency: pm.currency || 'ARS'
     })),
   }));
 };

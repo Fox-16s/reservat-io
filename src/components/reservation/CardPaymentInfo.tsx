@@ -1,5 +1,5 @@
 import { PaymentMethod } from '@/types/types';
-import { format } from 'date-fns';
+import { format, isValid } from 'date-fns';
 import { Banknote, CreditCard, Building2 } from 'lucide-react';
 
 interface CardPaymentInfoProps {
@@ -28,8 +28,14 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
     }
   };
 
+  const formatDate = (date: Date) => {
+    if (!date || !isValid(date)) {
+      return 'Invalid date';
+    }
+    return format(date, 'dd MMM yy');
+  };
+
   const totalPaid = paymentMethods.reduce((sum, payment) => {
-    // Convert USD to ARS for total calculation (using a fixed rate for simplicity)
     const rate = payment.currency === 'USD' ? 850 : 1;
     return sum + (payment.amount * rate);
   }, 0);
@@ -62,7 +68,7 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
                   {payment.type === 'bank_transfer' && 'Transferencia'}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {format(payment.date, 'dd MMM yy')}
+                  {formatDate(payment.date)}
                 </p>
               </div>
             </div>
