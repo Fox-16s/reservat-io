@@ -89,6 +89,7 @@ export type Database = {
         }
         Relationships: []
       }
+
       reservations: {
         Row: {
           client_name: string
@@ -131,6 +132,7 @@ export type Database = {
         }
         Relationships: []
       }
+
     }
     Views: {
       [_ in never]: never
@@ -243,3 +245,4 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
