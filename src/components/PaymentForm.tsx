@@ -29,26 +29,13 @@ const PaymentForm = ({
     setPaymentAmounts(prev => ({ ...prev, [method]: amount }));
     
     const numAmount = parseFloat(amount) || 0;
-    const existingMethodIndex = paymentMethods.findIndex(p => p.type === method);
-    const updatedMethods = [...paymentMethods];
+    const updatedMethods = paymentMethods.filter(p => p.type !== method);
     
-    if (existingMethodIndex >= 0) {
-      if (numAmount > 0) {
-        // Update existing payment method
-        updatedMethods[existingMethodIndex] = {
-          ...updatedMethods[existingMethodIndex],
-          amount: numAmount,
-        };
-      } else {
-        // Remove payment method if amount is 0
-        updatedMethods.splice(existingMethodIndex, 1);
-      }
-    } else if (numAmount > 0) {
-      // Add new payment method
+    if (numAmount > 0) {
       updatedMethods.push({ 
         type: method, 
         amount: numAmount,
-        date: new Date()
+        date: new Date() // Add current date for new payment methods
       });
     }
     

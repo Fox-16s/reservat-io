@@ -11,7 +11,6 @@ export interface Property {
 }
 
 export interface PaymentMethod {
-  id?: string;
   type: 'cash' | 'card' | 'bank_transfer';
   amount: number;
   date: Date;

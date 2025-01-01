@@ -3,7 +3,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Property, Reservation } from '../types/types';
 import { DateRange } from "react-day-picker";
 import { es } from 'date-fns/locale';
-import { isSameMonth, startOfMonth } from 'date-fns';
 
 interface PropertyCalendarCardProps {
   property: Property;
@@ -12,34 +11,12 @@ interface PropertyCalendarCardProps {
   selectedDates?: DateRange;
 }
 
-const RESERVATION_COLORS = [
-  'bg-[#ea384c]',  // Red
-  'bg-[#3b82f6]',  // Blue
-  'bg-[#22c55e]',  // Green
-  'bg-[#f59e0b]',  // Yellow
-  'bg-[#8b5cf6]',  // Purple
-];
-
 const PropertyCalendarCard = ({ 
   property, 
   reservations, 
   onSelect,
-  selectedDates,
+  selectedDates 
 }: PropertyCalendarCardProps) => {
-  const getReservationColor = (date: Date): string => {
-    const monthStart = startOfMonth(date);
-    const propertyReservations = reservations
-      .filter(r => r.propertyId === property.id)
-      .filter(r => isSameMonth(r.startDate, monthStart))
-      .sort((a, b) => a.startDate.getTime() - b.startDate.getTime());
-    
-    const reservation = getReservationForDate(date);
-    if (!reservation) return '';
-
-    const index = propertyReservations.findIndex(r => r.id === reservation.id);
-    return RESERVATION_COLORS[index % RESERVATION_COLORS.length];
-  };
-
   const isDateBooked = (date: Date): boolean => {
     const propertyReservations = reservations.filter(r => r.propertyId === property.id);
     return propertyReservations.some((r) => {
@@ -51,36 +28,6 @@ const PropertyCalendarCard = ({
       endDate.setHours(0, 0, 0, 0);
       return currentDate >= startDate && currentDate <= endDate;
     });
-  };
-
-  const getReservationForDate = (date: Date): Reservation | undefined => {
-    const propertyReservations = reservations.filter(r => r.propertyId === property.id);
-    return propertyReservations.find((r) => {
-      const currentDate = new Date(date.getTime());
-      currentDate.setHours(0, 0, 0, 0);
-      const startDate = new Date(r.startDate.getTime());
-      startDate.setHours(0, 0, 0, 0);
-      const endDate = new Date(r.endDate.getTime());
-      endDate.setHours(0, 0, 0, 0);
-      return currentDate >= startDate && currentDate <= endDate;
-    });
-  };
-
-  const handleDayClick = (date: Date) => {
-    const reservation = getReservationForDate(date);
-    if (reservation) {
-      const element = document.getElementById(`reservation-${reservation.id}`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-  };
-
-  const modifiersStyles = {
-    booked: (date: Date) => ({
-      color: 'white',
-      backgroundColor: getReservationColor(date) || '#ea384c',
-    }),
   };
 
   return (
@@ -100,9 +47,17 @@ const PropertyCalendarCard = ({
           modifiers={{
             booked: (date) => isDateBooked(date),
           }}
-          modifiersStyles={modifiersStyles}
+          modifiersStyles={{
+            booked: {
+              color: 'white',
+              backgroundColor: '#ea384c',
+            },
+            default: {
+              backgroundColor: '#F2FCE2',
+            }
+          }}
           classNames={{
-            day: "h-9 w-9 p-0 font-normal text-black font-medium cursor-pointer",
+            day: "h-9 w-9 p-0 font-normal text-black font-medium",
             day_selected: "bg-blue-500 text-white hover:bg-blue-600",
             day_today: "font-bold underline"
           }}
@@ -113,7 +68,6 @@ const PropertyCalendarCard = ({
               return date.toLocaleString('es', { month: 'long', year: 'numeric' });
             }
           }}
-          onDayClick={handleDayClick}
         />
       </CardContent>
     </Card>
