@@ -11,18 +11,16 @@ export const useCalendarResize = (containerRef: React.RefObject<HTMLDivElement>)
       const entry = entries[0];
       if (!entry) return;
 
-      // Clear any existing timeout
       if (resizeTimeoutRef.current) {
         window.clearTimeout(resizeTimeoutRef.current);
       }
 
-      // Set a new timeout
       resizeTimeoutRef.current = window.setTimeout(() => {
         const width = entry.contentRect.width;
         if (container && width > 0) {
           container.style.height = `${width}px`;
         }
-      }, 100); // Debounce time
+      }, 100);
     };
 
     const resizeObserver = new ResizeObserver(handleResize);

@@ -19,6 +19,7 @@ const CalendarSection = ({
   onSelect,
 }: CalendarSectionProps) => {
   const calendarContainerRef = useRef<HTMLDivElement>(null);
+  // Always call useCalendarResize, regardless of conditions
   useCalendarResize(calendarContainerRef);
 
   return (
