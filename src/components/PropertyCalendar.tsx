@@ -8,6 +8,7 @@ import { DateRange } from "react-day-picker";
 import CalendarHeader from './CalendarHeader';
 import ReservationDialog from './ReservationDialog';
 import { useReservations } from '@/hooks/useReservations';
+import BankingDataCard from './BankingDataCard';
 
 interface PropertyCalendarProps {
   selectedPropertyId: string;
@@ -161,6 +162,8 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
             selectedDates={selectedDates}
           />
         </div>
+
+        <BankingDataCard />
 
         <ReservationList
           reservations={filteredReservations}
