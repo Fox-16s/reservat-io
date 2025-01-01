@@ -154,8 +154,8 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
       />
 
       <div className="flex flex-col space-y-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div ref={calendarContainerRef} className="flex-1">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div ref={calendarContainerRef} className="lg:col-span-5">
             <PropertyCalendarCard
               property={selectedProperty}
               reservations={reservations}
@@ -163,7 +163,7 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
               selectedDates={selectedDates}
             />
           </div>
-          <div className="flex-1">
+          <div className="lg:col-span-7">
             <BankingDataCard />
           </div>
         </div>
