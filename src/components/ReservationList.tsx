@@ -104,9 +104,9 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
   );
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 max-w-full">
       <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-200">Lista de Reservas</h3>
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 grid grid-cols-1 gap-2">
         {sortedReservations.map((reservation) => (
           <Card 
             key={reservation.id} 
@@ -114,7 +114,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
                      hover:shadow-md transition-all duration-300 ease-in-out
                      border border-gray-100/50 dark:border-gray-700/50 
                      hover:border-primary/30 dark:hover:border-primary/30
-                     hover:scale-[1.01] transform"
+                     hover:scale-[1.01] transform w-full"
           >
             <div className="flex flex-col gap-2">
               {/* Reservation Details Section */}
