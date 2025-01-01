@@ -17,19 +17,31 @@ const PropertyCalendar = () => {
   const { toast } = useToast();
   const { reservations, createReservation, updateReservation, deleteReservation } = useReservations();
   const calendarContainerRef = useRef<HTMLDivElement>(null);
+  const resizeTimeoutRef = useRef<number>();
 
   useEffect(() => {
     const container = calendarContainerRef.current;
     if (!container) return;
 
-    const resizeObserver = new ResizeObserver(() => {
-      // Force a re-render of the calendar when container size changes
-      window.dispatchEvent(new Event('resize'));
-    });
+    const handleResize = () => {
+      // Clear any existing timeout
+      if (resizeTimeoutRef.current) {
+        window.clearTimeout(resizeTimeoutRef.current);
+      }
 
+      // Debounce the resize event
+      resizeTimeoutRef.current = window.setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 100);
+    };
+
+    const resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(container);
 
     return () => {
+      if (resizeTimeoutRef.current) {
+        window.clearTimeout(resizeTimeoutRef.current);
+      }
       resizeObserver.disconnect();
     };
   }, []);
