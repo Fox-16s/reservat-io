@@ -152,7 +152,7 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
         onAddReservation={() => setShowClientForm(true)}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-[auto,1fr] gap-8">
+      <div className="flex flex-col space-y-8">
         <div ref={calendarContainerRef}>
           <PropertyCalendarCard
             property={selectedProperty}
