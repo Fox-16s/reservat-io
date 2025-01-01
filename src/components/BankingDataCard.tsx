@@ -8,43 +8,43 @@ const BankingDataCard = () => {
 
   const bankingData = [
     {
-      label: "Macro Account",
-      value: "house.port.eagle"
+      label: "Bank Details",
+      value: "casa.puerto.aguila"
     },
     {
-      label: "Giselle Payment Market",
+      label: "Bank Details",
       value: "Arq.giselle"
     },
     {
-      label: "Macro Account Diego",
-      value: "mars.task.lima"
+      label: "Bank Details",
+      value: "marte.tarea.lima"
     }
   ];
 
-  const copyToClipboard = (text: string, label: string) => {
+  const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Copiado al portapapeles",
-      description: `${label}: ${text}`
+      description: text
     });
   };
 
   return (
-    <Card className="max-w-fit mx-auto">
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>Banking Data</CardTitle>
+        <CardTitle>Bank Details</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {bankingData.map((item, index) => (
             <div key={index} className="flex items-center justify-between gap-4">
               <span className="text-sm">
-                {item.label}: {item.value}
+                {item.value}
               </span>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => copyToClipboard(item.value, item.label)}
+                onClick={() => copyToClipboard(item.value)}
               >
                 <Copy className="h-4 w-4" />
               </Button>
