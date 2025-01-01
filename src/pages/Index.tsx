@@ -101,26 +101,40 @@ const Index = () => {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-36 lg:pt-40">
-        <div className="bg-white/20 dark:bg-gray-900/20 backdrop-blur-sm rounded-lg sm:rounded-xl shadow-md sm:shadow-xl p-3 sm:p-4 md:p-5 lg:p-6 overflow-x-auto">
-          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full flex justify-start overflow-x-auto mb-6">
+        <div className="relative overflow-hidden">
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 dark:from-purple-900/20 dark:to-indigo-900/20 pointer-events-none" />
+          
+          {/* Main content container with enhanced styling */}
+          <div className="relative bg-white/30 dark:bg-gray-900/30 backdrop-blur-md rounded-xl 
+            shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.24)]
+            border border-white/20 dark:border-gray-800/30
+            p-4 sm:p-6 md:p-8 lg:p-10
+            transition-all duration-300 ease-in-out
+            hover:shadow-[0_8px_40px_rgb(0,0,0,0.16)] dark:hover:shadow-[0_8px_40px_rgb(0,0,0,0.32)]
+            hover:bg-white/40 dark:hover:bg-gray-900/40
+            overflow-x-auto">
+            
+            <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="w-full flex justify-start overflow-x-auto mb-6 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-lg">
+                {PROPERTIES.map((property) => (
+                  <TabsTrigger 
+                    key={property.id} 
+                    value={property.id}
+                    className="flex items-center gap-2 transition-all duration-200 hover:bg-white/80 dark:hover:bg-gray-700/80"
+                  >
+                    <div className={`w-3 h-3 rounded-full ${property.color}`} />
+                    {property.name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
               {PROPERTIES.map((property) => (
-                <TabsTrigger 
-                  key={property.id} 
-                  value={property.id}
-                  className="flex items-center gap-2"
-                >
-                  <div className={`w-3 h-3 rounded-full ${property.color}`} />
-                  {property.name}
-                </TabsTrigger>
+                <TabsContent key={property.id} value={property.id}>
+                  <PropertyCalendar selectedPropertyId={property.id} />
+                </TabsContent>
               ))}
-            </TabsList>
-            {PROPERTIES.map((property) => (
-              <TabsContent key={property.id} value={property.id}>
-                <PropertyCalendar selectedPropertyId={property.id} />
-              </TabsContent>
-            ))}
-          </Tabs>
+            </Tabs>
+          </div>
         </div>
       </div>
     </div>
