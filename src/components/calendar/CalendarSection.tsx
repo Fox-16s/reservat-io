@@ -4,7 +4,6 @@ import PropertyCalendarCard from '../PropertyCalendarCard';
 import BankingDataCard from '../BankingDataCard';
 import { useCalendarResize } from '@/hooks/useCalendarResize';
 import { DateRange } from "react-day-picker";
-import ReservationList from '../ReservationList';
 
 interface CalendarSectionProps {
   selectedProperty: Property;
@@ -20,10 +19,11 @@ const CalendarSection = ({
   onSelect,
 }: CalendarSectionProps) => {
   const calendarContainerRef = useRef<HTMLDivElement>(null);
+  // Always call useCalendarResize, regardless of conditions
   useCalendarResize(calendarContainerRef);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4">
+    <div className="flex flex-col lg:flex-row gap-8">
       <div ref={calendarContainerRef} className="flex-1">
         <PropertyCalendarCard
           property={selectedProperty}
@@ -32,13 +32,8 @@ const CalendarSection = ({
           selectedDates={selectedDates}
         />
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex-1">
         <BankingDataCard />
-        <ReservationList
-          reservations={reservations.filter(r => r.propertyId === selectedProperty.id)}
-          onDelete={() => {}}
-          onEdit={() => {}}
-        />
       </div>
     </div>
   );
