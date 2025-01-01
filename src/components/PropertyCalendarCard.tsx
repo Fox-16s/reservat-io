@@ -30,6 +30,10 @@ const PropertyCalendarCard = ({
     });
   };
 
+  if (!property) {
+    return null; // Add safety check
+  }
+
   return (
     <Card className="w-full">
       <CardHeader>
