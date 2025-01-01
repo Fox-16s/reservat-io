@@ -24,28 +24,28 @@ const AuthForm = () => {
       }
     });
 
+    // Listen for auth errors
+    const authListener = supabase.auth.onError((error: AuthError) => {
+      console.error('Auth error:', error);
+      
+      if (error.message.includes('Invalid login credentials')) {
+        toast.error('Invalid email or password. Please try again.');
+      } else if (error.message.includes('Email not confirmed')) {
+        toast.error('Please verify your email address before signing in.');
+      } else if (error.message.includes('Email rate limit exceeded')) {
+        toast.error('Too many attempts. Please try again later.');
+      } else if (error.message.includes('Password is too weak')) {
+        toast.error('Password should be at least 6 characters long.');
+      } else {
+        toast.error('An error occurred. Please try again.');
+      }
+    });
+
     return () => {
       subscription.unsubscribe();
+      authListener.data.subscription.unsubscribe();
     };
   }, []);
-
-  const handleError = (error: AuthError) => {
-    console.error('Auth error:', error);
-    
-    // Handle specific error cases
-    if (error.message.includes('Invalid login credentials')) {
-      toast.error('Invalid email or password. Please try again.');
-    } else if (error.message.includes('Email not confirmed')) {
-      toast.error('Please verify your email address before signing in.');
-    } else if (error.message.includes('Email rate limit exceeded')) {
-      toast.error('Too many attempts. Please try again later.');
-    } else if (error.message.includes('Password is too weak')) {
-      toast.error('Password should be at least 6 characters long.');
-    } else {
-      // Generic error message for other cases
-      toast.error('An error occurred. Please try again.');
-    }
-  };
 
   return (
     <Auth
@@ -63,7 +63,6 @@ const AuthForm = () => {
       onlyThirdPartyProviders={false}
       view="sign_in"
       showLinks={true}
-      onError={handleError}
       localization={{
         variables: {
           sign_in: {
