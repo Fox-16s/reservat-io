@@ -30,24 +30,41 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
     const container = calendarContainerRef.current;
     if (!container) return;
 
-    const handleResize = () => {
+    let isResizing = false;
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (isResizing) return;
+      
+      isResizing = true;
       if (resizeTimeoutRef.current) {
         window.clearTimeout(resizeTimeoutRef.current);
       }
 
       resizeTimeoutRef.current = window.setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
+        try {
+          window.dispatchEvent(new Event('resize'));
+        } catch (error) {
+          console.error('Error dispatching resize event:', error);
+        } finally {
+          isResizing = false;
+        }
       }, 100);
-    };
+    });
 
-    const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(container);
+    try {
+      resizeObserver.observe(container);
+    } catch (error) {
+      console.error('Error observing container:', error);
+    }
 
     return () => {
       if (resizeTimeoutRef.current) {
         window.clearTimeout(resizeTimeoutRef.current);
       }
-      resizeObserver.disconnect();
+      try {
+        resizeObserver.disconnect();
+      } catch (error) {
+        console.error('Error disconnecting observer:', error);
+      }
     };
   }, []);
 

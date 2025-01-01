@@ -9,6 +9,24 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      "google maps location": {
+        Row: {
+          Coordenadas: string | null
+          created_at: string
+          id: number
+        }
+        Insert: {
+          Coordenadas?: string | null
+          created_at?: string
+          id?: number
+        }
+        Update: {
+          Coordenadas?: string | null
+          created_at?: string
+          id?: number
+        }
+        Relationships: []
+      }
       payment_methods: {
         Row: {
           amount: number
@@ -89,7 +107,6 @@ export type Database = {
         }
         Relationships: []
       }
-
       reservations: {
         Row: {
           client_name: string
@@ -132,7 +149,6 @@ export type Database = {
         }
         Relationships: []
       }
-
     }
     Views: {
       [_ in never]: never
@@ -245,4 +261,3 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
-
