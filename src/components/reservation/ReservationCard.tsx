@@ -39,7 +39,7 @@ const ReservationCard = ({
                 hover:shadow-md transition-all duration-300 ease-in-out
                 border border-gray-100/50 dark:border-gray-700/50 
                 hover:border-primary/30 dark:hover:border-primary/30
-                hover:scale-[1.01] transform w-full
+                hover:scale-[1.01] transform w-[300px] mx-auto
                 text-xs"
     >
       <div className="flex flex-col gap-1.5">

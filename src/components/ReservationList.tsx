@@ -96,7 +96,7 @@ const ReservationList = ({ reservations, onDelete, onEdit }: ReservationListProp
   );
 
   return (
-    <div className="space-y-1.5 max-w-full">
+    <div className="space-y-1.5 max-w-[300px] mx-auto">
       <h3 className="text-[10px] font-semibold text-gray-700 dark:text-gray-200">Lista de Reservas</h3>
       <div className="space-y-1 grid grid-cols-1 gap-1.5">
         {sortedReservations.map((reservation) => (
