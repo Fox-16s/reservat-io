@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Property, Reservation } from '../types/types';
@@ -17,6 +18,18 @@ const PropertyCalendarCard = ({
   onSelect,
   selectedDates 
 }: PropertyCalendarCardProps) => {
+  const calendarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Cleanup function for ResizeObserver
+    return () => {
+      if (calendarRef.current) {
+        const resizeObserver = new ResizeObserver(() => {});
+        resizeObserver.disconnect();
+      }
+    };
+  }, []);
+
   const isDateBooked = (date: Date): boolean => {
     const propertyReservations = reservations.filter(r => r.propertyId === property.id);
     return propertyReservations.some((r) => {
@@ -30,6 +43,10 @@ const PropertyCalendarCard = ({
     });
   };
 
+  if (!property) {
+    return null;
+  }
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -39,36 +56,38 @@ const PropertyCalendarCard = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Calendar
-          mode="range"
-          selected={selectedDates}
-          onSelect={onSelect}
-          className="rounded-lg border-2 border-indigo-100 p-4 bg-white shadow-sm"
-          modifiers={{
-            booked: (date) => isDateBooked(date),
-          }}
-          modifiersStyles={{
-            booked: {
-              color: 'white',
-              backgroundColor: '#ea384c',
-            },
-            default: {
-              backgroundColor: '#F2FCE2',
-            }
-          }}
-          classNames={{
-            day: "h-9 w-9 p-0 font-normal text-black font-medium",
-            day_selected: "bg-blue-500 text-white hover:bg-blue-600",
-            day_today: "font-bold underline"
-          }}
-          locale={es}
-          weekStartsOn={1}
-          formatters={{
-            formatCaption: (date, options) => {
-              return date.toLocaleString('es', { month: 'long', year: 'numeric' });
-            }
-          }}
-        />
+        <div ref={calendarRef}>
+          <Calendar
+            mode="range"
+            selected={selectedDates}
+            onSelect={onSelect}
+            className="rounded-lg border-2 border-indigo-100 p-4 bg-white shadow-sm"
+            modifiers={{
+              booked: (date) => isDateBooked(date),
+            }}
+            modifiersStyles={{
+              booked: {
+                color: 'white',
+                backgroundColor: '#ea384c',
+              },
+              default: {
+                backgroundColor: '#F2FCE2',
+              }
+            }}
+            classNames={{
+              day: "h-9 w-9 p-0 font-normal text-black font-medium",
+              day_selected: "bg-blue-500 text-white hover:bg-blue-600",
+              day_today: "font-bold underline"
+            }}
+            locale={es}
+            weekStartsOn={1}
+            formatters={{
+              formatCaption: (date, options) => {
+                return date.toLocaleString('es', { month: 'long', year: 'numeric' });
+              }
+            }}
+          />
+        </div>
       </CardContent>
     </Card>
   );
