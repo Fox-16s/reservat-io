@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Property, Reservation, Client, PaymentMethod } from '../types/types';
 import ReservationList from './ReservationList';
 import PropertyCalendarCard from './PropertyCalendarCard';
@@ -16,14 +16,19 @@ const PropertyCalendar = () => {
   const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
   const { toast } = useToast();
   const { reservations, createReservation, updateReservation, deleteReservation } = useReservations();
+  const calendarContainerRef = useRef<HTMLDivElement>(null);
 
-  // Add cleanup for ResizeObserver
   useEffect(() => {
-    const resizeObserver = new ResizeObserver((entries) => {
-      // Handle resize if needed
+    const container = calendarContainerRef.current;
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      // Force a re-render of the calendar when container size changes
+      window.dispatchEvent(new Event('resize'));
     });
 
-    // Cleanup function
+    resizeObserver.observe(container);
+
     return () => {
       resizeObserver.disconnect();
     };
@@ -130,7 +135,7 @@ const PropertyCalendar = () => {
         onAddReservation={() => setShowClientForm(true)}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div ref={calendarContainerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {PROPERTIES.map((property) => (
           <PropertyCalendarCard
             key={property.id}
