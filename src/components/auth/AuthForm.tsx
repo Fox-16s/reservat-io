@@ -31,7 +31,20 @@ const AuthForm = () => {
 
   const handleError = (error: AuthError) => {
     console.error('Auth error:', error);
-    toast.error(error.message);
+    
+    // Handle specific error cases
+    if (error.message.includes('Invalid login credentials')) {
+      toast.error('Invalid email or password. Please try again.');
+    } else if (error.message.includes('Email not confirmed')) {
+      toast.error('Please verify your email address before signing in.');
+    } else if (error.message.includes('Email rate limit exceeded')) {
+      toast.error('Too many attempts. Please try again later.');
+    } else if (error.message.includes('Password is too weak')) {
+      toast.error('Password should be at least 6 characters long.');
+    } else {
+      // Generic error message for other cases
+      toast.error('An error occurred. Please try again.');
+    }
   };
 
   return (
@@ -50,6 +63,7 @@ const AuthForm = () => {
       onlyThirdPartyProviders={false}
       view="sign_in"
       showLinks={true}
+      onError={handleError}
       localization={{
         variables: {
           sign_in: {
