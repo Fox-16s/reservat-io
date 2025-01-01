@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import PaymentSummary from './payment/PaymentSummary';
 import PaymentList from './payment/PaymentList';
 import PaymentForm from './payment/PaymentForm';
+import PaymentNotes from './payment/PaymentNotes';
 
 interface ReservationPaymentInfoProps {
   paymentMethods: PaymentMethod[];
@@ -14,6 +15,7 @@ interface ReservationPaymentInfoProps {
   totalAmount: number;
   reservationId: string;
   onPaymentAdded: () => void;
+  paymentNotes?: string;
 }
 
 const ReservationPaymentInfo = ({ 
@@ -21,7 +23,8 @@ const ReservationPaymentInfo = ({
   formatCurrency,
   totalAmount,
   reservationId,
-  onPaymentAdded
+  onPaymentAdded,
+  paymentNotes
 }: ReservationPaymentInfoProps) => {
   const [isAddingPayment, setIsAddingPayment] = useState(false);
   const { toast } = useToast();
@@ -93,6 +96,11 @@ const ReservationPaymentInfo = ({
             />
           )}
         </div>
+
+        <PaymentNotes 
+          reservationId={reservationId}
+          initialNotes={paymentNotes}
+        />
       </div>
     </div>
   );
