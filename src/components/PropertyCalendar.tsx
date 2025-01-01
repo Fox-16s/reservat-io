@@ -152,20 +152,22 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
         onAddReservation={() => setShowClientForm(true)}
       />
 
-      <div ref={calendarContainerRef}>
-        <PropertyCalendarCard
-          property={selectedProperty}
-          reservations={reservations}
-          onSelect={handleSelect}
-          selectedDates={selectedDates}
+      <div className="grid grid-cols-1 md:grid-cols-[auto,1fr] gap-8">
+        <div ref={calendarContainerRef}>
+          <PropertyCalendarCard
+            property={selectedProperty}
+            reservations={reservations}
+            onSelect={handleSelect}
+            selectedDates={selectedDates}
+          />
+        </div>
+
+        <ReservationList
+          reservations={filteredReservations}
+          onDelete={handleDeleteReservation}
+          onEdit={handleEditReservation}
         />
       </div>
-
-      <ReservationList
-        reservations={filteredReservations}
-        onDelete={handleDeleteReservation}
-        onEdit={handleEditReservation}
-      />
 
       <ReservationDialog
         open={showClientForm}
