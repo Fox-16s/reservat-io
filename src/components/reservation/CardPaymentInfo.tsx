@@ -1,5 +1,5 @@
 import { PaymentMethod } from '@/types/types';
-import { format, isValid } from 'date-fns';
+import { format } from 'date-fns';
 import { Banknote, CreditCard, Building2 } from 'lucide-react';
 
 interface CardPaymentInfoProps {
@@ -8,10 +8,10 @@ interface CardPaymentInfoProps {
 }
 
 const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) => {
-  const formatCurrency = (amount: number, currency: string) => {
+  const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
-      currency
+      currency: 'ARS'
     }).format(amount);
   };
 
@@ -28,17 +28,7 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
     }
   };
 
-  const formatDate = (date: Date) => {
-    if (!date || !isValid(date)) {
-      return 'Invalid date';
-    }
-    return format(date, 'dd MMM yy');
-  };
-
-  const totalPaid = paymentMethods.reduce((sum, payment) => {
-    const rate = payment.currency === 'USD' ? 850 : 1;
-    return sum + (payment.amount * rate);
-  }, 0);
+  const totalPaid = paymentMethods.reduce((sum, payment) => sum + payment.amount, 0);
   const remainingAmount = totalAmount - totalPaid;
 
   return (
@@ -48,7 +38,7 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
           Detalles de Pago
         </h4>
         <p className="text-lg font-semibold text-green-600 dark:text-green-400">
-          {formatCurrency(totalAmount, 'ARS')}
+          {formatCurrency(totalAmount)}
         </p>
       </div>
       <div className="space-y-1">
@@ -68,12 +58,12 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
                   {payment.type === 'bank_transfer' && 'Transferencia'}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {formatDate(payment.date)}
+                  {format(payment.date, 'dd MMM yy')}
                 </p>
               </div>
             </div>
             <span className="text-sm font-medium dark:text-gray-300">
-              {formatCurrency(payment.amount, payment.currency)}
+              {formatCurrency(payment.amount)}
             </span>
           </div>
         ))}
@@ -82,13 +72,13 @@ const CardPaymentInfo = ({ paymentMethods, totalAmount }: CardPaymentInfoProps) 
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium dark:text-gray-300">Total Pagado:</span>
             <span className="text-sm font-medium text-green-600 dark:text-green-400">
-              {formatCurrency(totalPaid, 'ARS')}
+              {formatCurrency(totalPaid)}
             </span>
           </div>
           <div className="flex justify-between items-center mt-1">
             <span className="text-sm font-medium dark:text-gray-300">Restante:</span>
             <span className={`text-sm font-medium ${remainingAmount > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-              {formatCurrency(remainingAmount, 'ARS')}
+              {formatCurrency(remainingAmount)}
             </span>
           </div>
         </div>

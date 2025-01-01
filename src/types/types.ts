@@ -15,7 +15,6 @@ export interface PaymentMethod {
   type: 'cash' | 'card' | 'bank_transfer';
   amount: number;
   date: Date;
-  currency: 'ARS' | 'USD';
 }
 
 export interface Reservation {
