@@ -26,14 +26,11 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
   const handleSelect = (range: DateRange | undefined) => {
     if (!range || !selectedProperty) return;
 
-    // Always update the selected dates state
-    setSelectedDates(range);
-
     if (!range.from) {
-      return;
+      setSelectedDates(range);
     } else if (range.from && range.to) {
-      const startDate = new Date(range.from);
-      const endDate = new Date(range.to);
+      const startDate = range.from;
+      const endDate = range.to;
       
       if (endDate < startDate) {
         toast({
@@ -50,6 +47,7 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
         : isDateRangeAvailable(startDate, endDate, selectedProperty.id, reservations);
 
       if (isAvailable) {
+        setSelectedDates(range);
         setShowClientForm(true);
       } else {
         toast({
@@ -59,21 +57,20 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
         });
         setSelectedDates(undefined);
       }
+    } else {
+      setSelectedDates(range);
     }
   };
 
   const handleClientSubmit = async (client: Client, dateRange: DateRange, totalAmount: number, paymentMethods: PaymentMethod[]) => {
     if (!dateRange.from || !dateRange.to || !selectedProperty) return;
 
-    const startDate = new Date(dateRange.from);
-    const endDate = new Date(dateRange.to);
-
     let success;
     if (editingReservation) {
       success = await updateReservation(
         editingReservation.id,
         client,
-        { from: startDate, to: endDate },
+        dateRange,
         totalAmount,
         paymentMethods
       );
@@ -81,7 +78,7 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
       success = await createReservation(
         selectedProperty.id,
         client,
-        { from: startDate, to: endDate },
+        dateRange,
         totalAmount,
         paymentMethods
       );
@@ -134,8 +131,6 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
           reservations={reservations}
           selectedDates={selectedDates}
           onSelect={handleSelect}
-          onDelete={handleDeleteReservation}
-          onEdit={handleEditReservation}
         />
 
         <ReservationList

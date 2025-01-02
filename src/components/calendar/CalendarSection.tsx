@@ -10,8 +10,6 @@ interface CalendarSectionProps {
   reservations: Reservation[];
   selectedDates: DateRange | undefined;
   onSelect: (range: DateRange | undefined) => void;
-  onDelete: (id: string) => void;
-  onEdit: (reservation: Reservation) => void;
 }
 
 const CalendarSection = ({
@@ -21,22 +19,21 @@ const CalendarSection = ({
   onSelect,
 }: CalendarSectionProps) => {
   const calendarContainerRef = useRef<HTMLDivElement>(null);
+  // Always call useCalendarResize, regardless of conditions
   useCalendarResize(calendarContainerRef);
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col lg:flex-row gap-8">
-        <div ref={calendarContainerRef} className="flex-1">
-          <PropertyCalendarCard
-            property={selectedProperty}
-            reservations={reservations}
-            onSelect={onSelect}
-            selectedDates={selectedDates}
-          />
-        </div>
-        <div className="flex-1">
-          <BankingDataCard />
-        </div>
+    <div className="flex flex-col lg:flex-row gap-8">
+      <div ref={calendarContainerRef} className="flex-1">
+        <PropertyCalendarCard
+          property={selectedProperty}
+          reservations={reservations}
+          onSelect={onSelect}
+          selectedDates={selectedDates}
+        />
+      </div>
+      <div className="flex-1">
+        <BankingDataCard />
       </div>
     </div>
   );
