@@ -34,6 +34,13 @@ const ReservationForm = ({
   });
   const { toast } = useToast();
 
+  // Update dateRange when initialDateRange changes
+  useEffect(() => {
+    if (initialDateRange?.from && initialDateRange?.to) {
+      setDateRange(initialDateRange);
+    }
+  }, [initialDateRange]);
+
   useEffect(() => {
     if (initialData) {
       setClient(initialData);
@@ -86,6 +93,15 @@ const ReservationForm = ({
       e.preventDefault();
     }
     
+    if (!dateRange?.from || !dateRange?.to) {
+      toast({
+        title: "Error",
+        description: "Por favor seleccione un rango de fechas",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (isEditing) {
       // When editing, just submit with the existing data
       onSubmit(client, dateRange, 0, []);
