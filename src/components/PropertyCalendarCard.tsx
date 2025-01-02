@@ -47,7 +47,15 @@ const PropertyCalendarCard = ({
           <Calendar
             mode="range"
             selected={selectedDates}
-            onSelect={onSelect}
+            onSelect={(range) => {
+              if (range?.from) {
+                range.from.setHours(0, 0, 0, 0);
+              }
+              if (range?.to) {
+                range.to.setHours(23, 59, 59, 999);
+              }
+              onSelect(range);
+            }}
             className="rounded-lg border-2 border-indigo-100 p-3 bg-white shadow-sm"
             modifiers={{
               booked: (date) => isDateBooked(date),
