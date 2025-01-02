@@ -4,11 +4,8 @@ import { Checkbox } from '../ui/checkbox';
 import { format } from 'date-fns';
 import { Card } from '../ui/card';
 import { PROPERTIES } from '../../utils/reservationUtils';
-import ReservationHeader from './ReservationHeader';
-import ReservationClientInfo from './ReservationClientInfo';
-import ReservationPaymentInfo from './ReservationPaymentInfo';
-import ReservationActions from './ReservationActions';
 import { Separator } from '../ui/separator';
+import { MessageSquare, Trash2 } from 'lucide-react';
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -28,75 +25,114 @@ const ReservationCard = ({
   onSelect,
   onEdit,
   onDelete,
-  onPaymentAdded,
   formatCreatedAt,
   formatCurrency,
   handleWhatsAppClick,
 }: ReservationCardProps) => {
+  const property = PROPERTIES.find(p => p.id === reservation.propertyId);
+  
+  const formatDate = (date: Date) => {
+    return format(new Date(date), 'dd/MM/yyyy');
+  };
+
   return (
-    <Card 
-      className="p-1.5 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm 
-                hover:shadow-md transition-all duration-300 ease-in-out
-                border border-gray-100/50 dark:border-gray-700/50 
-                hover:border-primary/30 dark:hover:border-primary/30
-                hover:scale-[1.01] transform w-[300px] mx-auto
-                text-xs"
-    >
-      <div className="flex flex-col gap-1.5">
-        <div className="space-y-1">
-          <div className="flex items-start gap-1">
-            <div className="flex items-center h-full">
-              <Checkbox
-                id={`reservation-${reservation.id}`}
-                onCheckedChange={() => onSelect(reservation.id)}
-                className="h-2 w-2 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-              />
-            </div>
-            <div className="flex-1 space-y-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1">
-                  <div className={`w-1 h-1 rounded-full ${PROPERTIES.find(p => p.id === reservation.propertyId)?.color}`} />
-                  <span className="font-medium text-[8px] dark:text-gray-200">
-                    {PROPERTIES.find(p => p.id === reservation.propertyId)?.name}
-                  </span>
-                </div>
+    <Card className="p-4 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm 
+                    hover:shadow-md transition-all duration-300 ease-in-out
+                    border border-gray-100/50 dark:border-gray-700/50 
+                    hover:border-primary/30 dark:hover:border-primary/30
+                    hover:scale-[1.01] transform w-full">
+      <div className="space-y-4">
+        {/* Header Section */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id={`reservation-${reservation.id}`}
+              onCheckedChange={() => onSelect(reservation.id)}
+              className="h-4 w-4"
+            />
+            <div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${property?.color}`} />
+                <span className="font-medium text-sm dark:text-gray-200">
+                  {property?.name}
+                </span>
               </div>
-
-              <ReservationHeader
-                userName={userInfo.name}
-                createdAt={userInfo.createdAt}
-                formatCreatedAt={formatCreatedAt}
-              />
-
-              <ReservationClientInfo client={reservation.client} />
-
-              <div>
-                <p className="text-[8px] text-gray-600 dark:text-gray-400">
-                  <span className="font-medium">Fechas:</span> {format(reservation.startDate, 'dd/MM/yyyy')} - {format(reservation.endDate, 'dd/MM/yyyy')}
-                </p>
-              </div>
-
-              <ReservationActions
-                phone={reservation.client.phone}
-                onEdit={() => onEdit(reservation)}
-                onDelete={() => onDelete(reservation.id)}
-                onWhatsAppClick={handleWhatsAppClick}
-              />
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Created by: {userInfo.name || 'Unknown'} on {formatCreatedAt(userInfo.createdAt)}
+              </p>
             </div>
           </div>
         </div>
 
-        <Separator className="my-1" />
+        {/* Client Information */}
+        <div className="space-y-2">
+          <h3 className="font-medium text-sm">{reservation.client.name}</h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {reservation.client.phone}
+          </p>
+          {reservation.client.notes && (
+            <p className="text-sm text-gray-500 italic">
+              {reservation.client.notes}
+            </p>
+          )}
+        </div>
 
-        <div className="space-y-0.5">
-          <h4 className="text-[8px] font-medium text-gray-700 dark:text-gray-300">Detalles de Pago</h4>
-          <ReservationPaymentInfo
-            paymentMethods={reservation.paymentMethods}
-            formatCurrency={formatCurrency}
-            totalAmount={reservation.totalAmount}
-            reservationId={reservation.id}
-            onPaymentAdded={onPaymentAdded}
-          />
+        {/* Dates */}
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          <p>
+            <span className="font-medium">Check-in:</span> {formatDate(reservation.startDate)}
+          </p>
+          <p>
+            <span className="font-medium">Check-out:</span> {formatDate(reservation.endDate)}
+          </p>
+        </div>
+
+        <Separator />
+
+        {/* Payment Information */}
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium">Payment Details</h4>
+          <p className="text-sm">
+            <span className="font-medium">Total Amount:</span>{' '}
+            {formatCurrency(reservation.totalAmount)}
+          </p>
+          <div className="space-y-1">
+            {reservation.paymentMethods.map((payment, index) => (
+              <div key={index} className="text-sm text-gray-600 dark:text-gray-400">
+                {payment.type}: {formatCurrency(payment.amount)}
+                {payment.date && ` - ${format(new Date(payment.date), 'dd/MM/yyyy')}`}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handleWhatsAppClick(reservation.client.phone)}
+            className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900"
+          >
+            <MessageSquare className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onEdit(reservation)}
+            className="dark:border-gray-600 dark:text-gray-300"
+          >
+            Edit
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onDelete(reservation.id)}
+            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900 dark:border-red-800"
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete
+          </Button>
         </div>
       </div>
     </Card>
