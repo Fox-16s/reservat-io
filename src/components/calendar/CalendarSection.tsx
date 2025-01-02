@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { Property, Reservation } from '../../types/types';
 import PropertyCalendarCard from '../PropertyCalendarCard';
 import BankingDataCard from '../BankingDataCard';
+import ReservationList from '../ReservationList';
 import { useCalendarResize } from '@/hooks/useCalendarResize';
 import { DateRange } from "react-day-picker";
 
@@ -10,6 +11,8 @@ interface CalendarSectionProps {
   reservations: Reservation[];
   selectedDates: DateRange | undefined;
   onSelect: (range: DateRange | undefined) => void;
+  onDelete: (id: string) => void;
+  onEdit: (reservation: Reservation) => void;
 }
 
 const CalendarSection = ({
@@ -17,6 +20,8 @@ const CalendarSection = ({
   reservations,
   selectedDates,
   onSelect,
+  onDelete,
+  onEdit,
 }: CalendarSectionProps) => {
   const calendarContainerRef = useRef<HTMLDivElement>(null);
   useCalendarResize(calendarContainerRef);

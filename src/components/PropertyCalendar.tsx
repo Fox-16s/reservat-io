@@ -131,6 +131,8 @@ const PropertyCalendar = ({ selectedPropertyId }: PropertyCalendarProps) => {
           reservations={reservations}
           selectedDates={selectedDates}
           onSelect={handleSelect}
+          onDelete={handleDeleteReservation}
+          onEdit={handleEditReservation}
         />
 
         <ReservationList
